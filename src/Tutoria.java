@@ -7,10 +7,16 @@ public class Tutoria {
         this.profesor = profesor;
     }
 
-    public Estudiante getEstudiante() { return estudiante; }
-    public Profesor getProfesor() { return profesor; }
+    public Estudiante getEstudiante() {
+        return estudiante;
+    }
 
+    public Profesor getProfesor() {
+        return profesor;
+    }
+
+    @Override
     public String toString() {
-        return estudiante.toString() + " ASIGNADO A " + profesor.toString();
+        return "Estudiante: " + estudiante.getNombre() + " | Profesor: " + profesor.getNombre();
     }
 }
