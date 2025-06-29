@@ -24,4 +24,3 @@ public class Estudiante {
         return codigo + " - " + nombre + " (" + materia + ")";
     }
 }
-

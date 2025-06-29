@@ -1,5 +1,6 @@
+// Profesor.java
 public class Profesor {
-    private static int contador = 1; // Agrega este campo
+    private static int contador = 1;
     private String nombre;
     private String codigo;
     private String experiencia;
@@ -24,3 +25,4 @@ public class Profesor {
         return codigo + " - " + nombre + " (" + materia + ")";
     }
 }
+

@@ -10,7 +10,6 @@ public class ModuloRecursos {
         eliminados = new ArrayList<>();
     }
 
-    // Crear recurso
     public void crearRecurso(String titulo, String tipo, String materia, String nivel, String contenido) {
         int idNuevo = recursos.size() + 1;
         RecursoEducativo recurso = new RecursoEducativo(idNuevo, titulo, tipo, materia, nivel, contenido);
@@ -18,7 +17,6 @@ public class ModuloRecursos {
         System.out.println("Recurso creado: " + recurso);
     }
 
-    // Leer recursos (todos o por filtro)
     public void leerRecursos(String materia, String nivel) {
         System.out.println("Lista de recursos:");
         for (RecursoEducativo r : recursos) {
@@ -29,7 +27,6 @@ public class ModuloRecursos {
         }
     }
 
-    // Actualizar recurso
     public void actualizarRecurso(int id, String nuevoTitulo, String nuevoTipo, String nuevaMateria, String nuevoNivel, String nuevoContenido) {
         for (RecursoEducativo r : recursos) {
             if (r.getId() == id) {
@@ -45,7 +42,6 @@ public class ModuloRecursos {
         System.out.println("Recurso no encontrado");
     }
 
-    // Eliminar recurso
     public void eliminarRecurso(int id) {
         for (RecursoEducativo r : recursos) {
             if (r.getId() == id) {
@@ -58,7 +54,6 @@ public class ModuloRecursos {
         System.out.println("Recurso no encontrado");
     }
 
-    // Consultar recursos eliminados
     public void mostrarEliminados() {
         System.out.println("Recursos eliminados:");
         for (RecursoEducativo r : eliminados) {
@@ -66,7 +61,6 @@ public class ModuloRecursos {
         }
     }
 
-    // Devuelve lista (para conectar a la GUI después)
     public List<RecursoEducativo> getRecursos() {
         return recursos;
     }

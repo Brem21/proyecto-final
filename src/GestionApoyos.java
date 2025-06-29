@@ -13,21 +13,21 @@ public class GestionApoyos {
         historialTutorias = new ArrayList<>();
     }
 
-    // Agregar estudiante a la cola
+    // Agrega estudiante a la cola
     public void agregarSolicitud(Estudiante e) {
         colaSolicitudes.offer(e);
     }
 
-    // Agregar profesor a la lista
+    // Agrega profesor a la lista
     public void agregarProfesor(Profesor p) {
         profesoresDisponibles.add(p);
     }
 
-    // Asignar tutoría (FIFO: primer estudiante, primer profesor disponible)
+    // Asigna tutoría (FIFO: primer estudiante, primer profesor disponible)
     public Tutoria asignarTutor() {
         if (!colaSolicitudes.isEmpty() && !profesoresDisponibles.isEmpty()) {
             Estudiante e = colaSolicitudes.poll();
-            Profesor p = profesoresDisponibles.get(0); // asigna el primero, puedes cambiar esto si quieres buscar por materia
+            Profesor p = profesoresDisponibles.get(0); // asigna el primero, puedes cambiar la lógica si quieres
             Tutoria t = new Tutoria(e, p);
             historialTutorias.add(t);
             return t;
@@ -49,12 +49,11 @@ public class GestionApoyos {
     public ArrayList<Tutoria> getHistorialTutorias() {
         return historialTutorias;
     }
+
     // Eliminar estudiante por código (de cola y del historial)
     public boolean eliminarEstudiantePorCodigo(String codigo) {
         boolean eliminado = false;
-        // Elimina de la cola
         colaSolicitudes.removeIf(e -> e.getCodigo().equals(codigo));
-        // Elimina de historial
         eliminado = historialTutorias.removeIf(t -> t.getEstudiante().getCodigo().equals(codigo));
         return eliminado;
     }
@@ -62,11 +61,8 @@ public class GestionApoyos {
     // Eliminar profesor por código (de lista y del historial)
     public boolean eliminarProfesorPorCodigo(String codigo) {
         boolean eliminado = false;
-        // Elimina de la lista de profesores disponibles
         profesoresDisponibles.removeIf(p -> p.getCodigo().equals(codigo));
-        // Elimina de historial
         eliminado = historialTutorias.removeIf(t -> t.getProfesor().getCodigo().equals(codigo));
         return eliminado;
     }
-
 }
