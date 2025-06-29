@@ -49,4 +49,24 @@ public class GestionApoyos {
     public ArrayList<Tutoria> getHistorialTutorias() {
         return historialTutorias;
     }
+    // Eliminar estudiante por código (de cola y del historial)
+    public boolean eliminarEstudiantePorCodigo(String codigo) {
+        boolean eliminado = false;
+        // Elimina de la cola
+        colaSolicitudes.removeIf(e -> e.getCodigo().equals(codigo));
+        // Elimina de historial
+        eliminado = historialTutorias.removeIf(t -> t.getEstudiante().getCodigo().equals(codigo));
+        return eliminado;
+    }
+
+    // Eliminar profesor por código (de lista y del historial)
+    public boolean eliminarProfesorPorCodigo(String codigo) {
+        boolean eliminado = false;
+        // Elimina de la lista de profesores disponibles
+        profesoresDisponibles.removeIf(p -> p.getCodigo().equals(codigo));
+        // Elimina de historial
+        eliminado = historialTutorias.removeIf(t -> t.getProfesor().getCodigo().equals(codigo));
+        return eliminado;
+    }
+
 }
