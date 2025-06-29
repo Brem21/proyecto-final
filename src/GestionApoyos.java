@@ -39,8 +39,11 @@ public class GestionApoyos {
     public ArrayList<Tutoria> getHistorialTutorias() {
         return historialTutorias;
     }
+<<<<<<< HEAD
     public ArrayList<Profesor> getProfesoresDisponibles() {
         return profesoresDisponibles;
     }
 
+=======
+>>>>>>> origin/main
 }
