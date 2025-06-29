@@ -3,7 +3,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class MainFrame extends JFrame {
-
     private GestionApoyos sistema;
 
     public MainFrame() {
@@ -32,7 +31,6 @@ public class MainFrame extends JFrame {
 
         add(panelMenu);
 
-        // Acciones de los botones
         btnAgregarEstudiante.addActionListener(e -> agregarEstudiante());
         btnAgregarProfesor.addActionListener(e -> agregarProfesor());
         btnAsignarTutoria.addActionListener(e -> asignarTutoria());
@@ -43,7 +41,6 @@ public class MainFrame extends JFrame {
         setVisible(true);
     }
 
-    // Ventana para agregar estudiante (código automático)
     private void agregarEstudiante() {
         JTextField nombre = new JTextField();
         JTextField edad = new JTextField();
@@ -58,8 +55,7 @@ public class MainFrame extends JFrame {
                 "Horas:", horas
         };
 
-        int option = JOptionPane.showConfirmDialog(
-                this, message, "Agregar Estudiante", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Agregar Estudiante", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
             try {
@@ -77,7 +73,6 @@ public class MainFrame extends JFrame {
         }
     }
 
-    // Ventana para agregar profesor (código automático)
     private void agregarProfesor() {
         JTextField nombre = new JTextField();
         JTextField experiencia = new JTextField();
@@ -88,12 +83,11 @@ public class MainFrame extends JFrame {
         Object[] message = {
                 "Nombre:", nombre,
                 "Experiencia:", experiencia,
-                "Materia a dar:", materia,
+                "Materia:", materia,
                 "Horas:", horas
         };
 
-        int option = JOptionPane.showConfirmDialog(
-                this, message, "Agregar Profesor", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Agregar Profesor", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
             Profesor prof = new Profesor(
@@ -107,7 +101,6 @@ public class MainFrame extends JFrame {
         }
     }
 
-    // Asignar tutoría automáticamente (FIFO)
     private void asignarTutoria() {
         Tutoria t = sistema.asignarTutor();
         if (t != null) {
@@ -119,12 +112,10 @@ public class MainFrame extends JFrame {
                             "\nMateria: " + t.getEstudiante().getMateria() +
                             "\nHoras: " + t.getEstudiante().getHoras());
         } else {
-            JOptionPane.showMessageDialog(this,
-                    "No hay estudiantes o profesores disponibles para asignar.");
+            JOptionPane.showMessageDialog(this, "No hay estudiantes o profesores disponibles para asignar.");
         }
     }
 
-    // Ver historial de tutorías
     private void verHistorial() {
         StringBuilder sb = new StringBuilder();
         if (sistema.getHistorialTutorias().isEmpty()) {
@@ -147,7 +138,6 @@ public class MainFrame extends JFrame {
         JOptionPane.showMessageDialog(this, scroll, "Historial de Tutorías", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Ver solicitudes de estudiantes (cola FIFO)
     private void verSolicitudesEstudiantes() {
         StringBuilder sb = new StringBuilder();
         if (sistema.getColaSolicitudes().isEmpty()) {
@@ -164,7 +154,6 @@ public class MainFrame extends JFrame {
         JOptionPane.showMessageDialog(this, scroll, "Solicitudes de Estudiantes", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Ver profesores registrados
     private void verProfesoresRegistrados() {
         StringBuilder sb = new StringBuilder();
         ArrayList<Profesor> profesores = sistema.getProfesoresDisponibles();

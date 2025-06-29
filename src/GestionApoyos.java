@@ -24,7 +24,7 @@ public class GestionApoyos {
     public Tutoria asignarTutor() {
         if (!colaSolicitudes.isEmpty() && !profesoresDisponibles.isEmpty()) {
             Estudiante e = colaSolicitudes.poll();
-            Profesor p = profesoresDisponibles.get(0); // Asigna siempre el primero (puedes mejorar para asignar según materia)
+            Profesor p = profesoresDisponibles.get(0);
             Tutoria t = new Tutoria(e, p);
             historialTutorias.add(t);
             return t;
@@ -39,8 +39,8 @@ public class GestionApoyos {
     public ArrayList<Tutoria> getHistorialTutorias() {
         return historialTutorias;
     }
+
     public ArrayList<Profesor> getProfesoresDisponibles() {
         return profesoresDisponibles;
     }
-
 }
