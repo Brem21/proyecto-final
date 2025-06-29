@@ -1,11 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-<<<<<<< HEAD
 import java.util.ArrayList;
-=======
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
->>>>>>> origin/main
 
 public class MainFrame extends JFrame {
 
@@ -15,22 +10,14 @@ public class MainFrame extends JFrame {
         sistema = new GestionApoyos();
         setTitle("Gestión de Tutorías - Proyecto Final");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-<<<<<<< HEAD
         setSize(500, 500);
         setLocationRelativeTo(null);
 
         JPanel panelMenu = new JPanel(new GridLayout(6, 1, 10, 10));
-=======
-        setSize(500, 400);
-        setLocationRelativeTo(null);
-
-        JPanel panelMenu = new JPanel(new GridLayout(4, 1, 10, 10));
->>>>>>> origin/main
         panelMenu.setBorder(BorderFactory.createEmptyBorder(30, 80, 30, 80));
 
         JButton btnAgregarEstudiante = new JButton("Agregar Estudiante");
         JButton btnAgregarProfesor = new JButton("Agregar Profesor");
-<<<<<<< HEAD
         JButton btnAsignarTutoria = new JButton("Asignar Tutoría");
         JButton btnHistorial = new JButton("Ver Historial de Tutorías");
         JButton btnVerSolicitudes = new JButton("Ver Solicitudes Estudiantes");
@@ -42,35 +29,20 @@ public class MainFrame extends JFrame {
         panelMenu.add(btnHistorial);
         panelMenu.add(btnVerSolicitudes);
         panelMenu.add(btnVerProfesores);
-=======
-        JButton btnAsignarTutoría = new JButton("Asignar Tutoría");
-        JButton btnHistorial = new JButton("Ver Historial de Tutorías");
-
-        panelMenu.add(btnAgregarEstudiante);
-        panelMenu.add(btnAgregarProfesor);
-        panelMenu.add(btnAsignarTutoría);
-        panelMenu.add(btnHistorial);
->>>>>>> origin/main
 
         add(panelMenu);
 
         // Acciones de los botones
         btnAgregarEstudiante.addActionListener(e -> agregarEstudiante());
         btnAgregarProfesor.addActionListener(e -> agregarProfesor());
-<<<<<<< HEAD
         btnAsignarTutoria.addActionListener(e -> asignarTutoria());
         btnHistorial.addActionListener(e -> verHistorial());
         btnVerSolicitudes.addActionListener(e -> verSolicitudesEstudiantes());
         btnVerProfesores.addActionListener(e -> verProfesoresRegistrados());
-=======
-        btnAsignarTutoría.addActionListener(e -> asignarTutoria());
-        btnHistorial.addActionListener(e -> verHistorial());
->>>>>>> origin/main
 
         setVisible(true);
     }
 
-<<<<<<< HEAD
     // Ventana para agregar estudiante (código automático)
     private void agregarEstudiante() {
         JTextField nombre = new JTextField();
@@ -81,19 +53,6 @@ public class MainFrame extends JFrame {
 
         Object[] message = {
                 "Nombre:", nombre,
-=======
-    // Ventana para agregar estudiante
-    private void agregarEstudiante() {
-        JTextField nombre = new JTextField();
-        JTextField codigo = new JTextField();
-        JTextField edad = new JTextField();
-        JTextField materia = new JTextField();
-        JTextField horas = new JTextField();
-
-        Object[] message = {
-                "Nombre:", nombre,
-                "Código:", codigo,
->>>>>>> origin/main
                 "Edad:", edad,
                 "Materia:", materia,
                 "Horas:", horas
@@ -106,43 +65,25 @@ public class MainFrame extends JFrame {
             try {
                 Estudiante est = new Estudiante(
                         nombre.getText(),
-<<<<<<< HEAD
                         Integer.parseInt(edad.getText()),
                         materia.getText(),
                         (String) horas.getSelectedItem()
                 );
                 sistema.agregarSolicitud(est);
                 JOptionPane.showMessageDialog(this, "Estudiante agregado (código: " + est.getCodigo() + ")");
-=======
-                        codigo.getText(),
-                        Integer.parseInt(edad.getText()),
-                        materia.getText(),
-                        horas.getText()
-                );
-                sistema.agregarSolicitud(est);
-                JOptionPane.showMessageDialog(this, "Estudiante agregado a la cola correctamente.");
->>>>>>> origin/main
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Datos inválidos. Intenta de nuevo.");
             }
         }
     }
 
-<<<<<<< HEAD
     // Ventana para agregar profesor (código automático)
-=======
-    // Ventana para agregar profesor
->>>>>>> origin/main
     private void agregarProfesor() {
         JTextField nombre = new JTextField();
         JTextField experiencia = new JTextField();
         JTextField materia = new JTextField();
-<<<<<<< HEAD
         String[] opcionesHoras = { "1 hora", "2 horas", "3 horas" };
         JComboBox<String> horas = new JComboBox<>(opcionesHoras);
-=======
-        JTextField horas = new JTextField();
->>>>>>> origin/main
 
         Object[] message = {
                 "Nombre:", nombre,
@@ -159,17 +100,10 @@ public class MainFrame extends JFrame {
                     nombre.getText(),
                     experiencia.getText(),
                     materia.getText(),
-<<<<<<< HEAD
                     (String) horas.getSelectedItem()
             );
             sistema.agregarProfesor(prof);
             JOptionPane.showMessageDialog(this, "Profesor registrado (código: " + prof.getCodigo() + ")");
-=======
-                    horas.getText()
-            );
-            sistema.agregarProfesor(prof);
-            JOptionPane.showMessageDialog(this, "Profesor registrado correctamente.");
->>>>>>> origin/main
         }
     }
 
@@ -179,13 +113,9 @@ public class MainFrame extends JFrame {
         if (t != null) {
             JOptionPane.showMessageDialog(this,
                     "Tutoría asignada:\nEstudiante: " + t.getEstudiante().getNombre() +
-<<<<<<< HEAD
                             "\n(Código: " + t.getEstudiante().getCodigo() + ")" +
                             "\nProfesor: " + t.getProfesor().getNombre() +
                             "\n(Código: " + t.getProfesor().getCodigo() + ")" +
-=======
-                            "\nProfesor: " + t.getProfesor().getNombre() +
->>>>>>> origin/main
                             "\nMateria: " + t.getEstudiante().getMateria() +
                             "\nHoras: " + t.getEstudiante().getHoras());
         } else {
@@ -202,13 +132,9 @@ public class MainFrame extends JFrame {
         } else {
             for (Tutoria t : sistema.getHistorialTutorias()) {
                 sb.append("Estudiante: ").append(t.getEstudiante().getNombre())
-<<<<<<< HEAD
                         .append(" (").append(t.getEstudiante().getCodigo()).append(")")
                         .append(" | Profesor: ").append(t.getProfesor().getNombre())
                         .append(" (").append(t.getProfesor().getCodigo()).append(")")
-=======
-                        .append(" | Profesor: ").append(t.getProfesor().getNombre())
->>>>>>> origin/main
                         .append(" | Materia: ").append(t.getEstudiante().getMateria())
                         .append(" | Horas: ").append(t.getEstudiante().getHoras())
                         .append("\n");
@@ -221,7 +147,6 @@ public class MainFrame extends JFrame {
         JOptionPane.showMessageDialog(this, scroll, "Historial de Tutorías", JOptionPane.INFORMATION_MESSAGE);
     }
 
-<<<<<<< HEAD
     // Ver solicitudes de estudiantes (cola FIFO)
     private void verSolicitudesEstudiantes() {
         StringBuilder sb = new StringBuilder();
@@ -257,8 +182,6 @@ public class MainFrame extends JFrame {
         JOptionPane.showMessageDialog(this, scroll, "Profesores Registrados", JOptionPane.INFORMATION_MESSAGE);
     }
 
-=======
->>>>>>> origin/main
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainFrame::new);
     }

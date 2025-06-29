@@ -13,18 +13,21 @@ public class GestionApoyos {
         historialTutorias = new ArrayList<>();
     }
 
+    // Agregar estudiante a la cola
     public void agregarSolicitud(Estudiante e) {
         colaSolicitudes.offer(e);
     }
 
+    // Agregar profesor a la lista
     public void agregarProfesor(Profesor p) {
         profesoresDisponibles.add(p);
     }
 
+    // Asignar tutoría (FIFO: primer estudiante, primer profesor disponible)
     public Tutoria asignarTutor() {
         if (!colaSolicitudes.isEmpty() && !profesoresDisponibles.isEmpty()) {
             Estudiante e = colaSolicitudes.poll();
-            Profesor p = profesoresDisponibles.get(0); // Asigna siempre el primero (puedes mejorar para asignar según materia)
+            Profesor p = profesoresDisponibles.get(0); // asigna el primero, puedes cambiar esto si quieres buscar por materia
             Tutoria t = new Tutoria(e, p);
             historialTutorias.add(t);
             return t;
@@ -32,18 +35,18 @@ public class GestionApoyos {
         return null;
     }
 
+    // Obtener la cola de solicitudes de estudiantes
     public Queue<Estudiante> getColaSolicitudes() {
         return colaSolicitudes;
     }
 
-    public ArrayList<Tutoria> getHistorialTutorias() {
-        return historialTutorias;
-    }
-<<<<<<< HEAD
+    // Obtener la lista de profesores registrados
     public ArrayList<Profesor> getProfesoresDisponibles() {
         return profesoresDisponibles;
     }
 
-=======
->>>>>>> origin/main
+    // Obtener el historial de tutorías realizadas
+    public ArrayList<Tutoria> getHistorialTutorias() {
+        return historialTutorias;
+    }
 }
