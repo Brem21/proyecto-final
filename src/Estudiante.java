@@ -1,5 +1,5 @@
 public class Estudiante {
-    private static int contador = 1;
+    private static int contador = 1; // Agrega este campo
     private String nombre;
     private String codigo;
     private int edad;
