@@ -1,68 +1,71 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.ArrayList;
-
+import java.util.*;
 public class GestionApoyos {
     private Queue<Estudiante> colaSolicitudes;
     private ArrayList<Profesor> profesoresDisponibles;
     private ArrayList<Tutoria> historialTutorias;
+    private ArrayList<RecursoAcademico> recursosAcademicos; // Agregado
 
     public GestionApoyos() {
         colaSolicitudes = new LinkedList<>();
         profesoresDisponibles = new ArrayList<>();
         historialTutorias = new ArrayList<>();
+        recursosAcademicos = new ArrayList<>();
     }
 
-    // Agrega estudiante a la cola
-    public void agregarSolicitud(Estudiante e) {
+    public void agregarEstudiante(Estudiante e) {
         colaSolicitudes.offer(e);
     }
 
-    // Agrega profesor a la lista
     public void agregarProfesor(Profesor p) {
         profesoresDisponibles.add(p);
     }
 
-    // Asigna tutoría (FIFO: primer estudiante, primer profesor disponible)
-    public Tutoria asignarTutor() {
-        if (!colaSolicitudes.isEmpty() && !profesoresDisponibles.isEmpty()) {
-            Estudiante e = colaSolicitudes.poll();
-            Profesor p = profesoresDisponibles.get(0); // asigna el primero, puedes cambiar la lógica si quieres
-            Tutoria t = new Tutoria(e, p);
-            historialTutorias.add(t);
-            return t;
+    public void agregarRecursoAcademico(RecursoAcademico r) {
+        recursosAcademicos.add(r);
+    }
+
+    public String listarSolicitudes() {
+        if (colaSolicitudes.isEmpty()) return "No hay solicitudes pendientes.";
+        StringBuilder sb = new StringBuilder();
+        for (Estudiante e : colaSolicitudes) {
+            sb.append(e.toString()).append("\n");
         }
-        return null;
+        return sb.toString();
     }
 
-    // Obtener la cola de solicitudes de estudiantes
-    public Queue<Estudiante> getColaSolicitudes() {
-        return colaSolicitudes;
+    public String listarProfesoresRegistrados() {
+        if (profesoresDisponibles.isEmpty()) return "No hay profesores registrados.";
+        StringBuilder sb = new StringBuilder();
+        for (Profesor p : profesoresDisponibles) {
+            sb.append(p.toString()).append("\n");
+        }
+        return sb.toString();
     }
 
-    // Obtener la lista de profesores registrados
-    public ArrayList<Profesor> getProfesoresDisponibles() {
-        return profesoresDisponibles;
+    public String listarHistorialTutorias() {
+        if (historialTutorias.isEmpty()) return "No hay tutorías en el historial.";
+        StringBuilder sb = new StringBuilder();
+        for (Tutoria t : historialTutorias) {
+            sb.append(t.toString()).append("\n");
+        }
+        return sb.toString();
     }
 
-    // Obtener el historial de tutorías realizadas
-    public ArrayList<Tutoria> getHistorialTutorias() {
-        return historialTutorias;
+    public String listarRecursosAcademicos() {
+        if (recursosAcademicos.isEmpty()) return "No hay recursos académicos.";
+        StringBuilder sb = new StringBuilder();
+        for (RecursoAcademico r : recursosAcademicos) {
+            sb.append(r.toString()).append("\n");
+        }
+        return sb.toString();
     }
-
-    // Eliminar estudiante por código (de cola y del historial)
+    // ...
     public boolean eliminarEstudiantePorCodigo(String codigo) {
-        boolean eliminado = false;
-        colaSolicitudes.removeIf(e -> e.getCodigo().equals(codigo));
-        eliminado = historialTutorias.removeIf(t -> t.getEstudiante().getCodigo().equals(codigo));
-        return eliminado;
+        return colaSolicitudes.removeIf(e -> e.getCodigo().equals(codigo));
     }
 
-    // Eliminar profesor por código (de lista y del historial)
     public boolean eliminarProfesorPorCodigo(String codigo) {
-        boolean eliminado = false;
-        profesoresDisponibles.removeIf(p -> p.getCodigo().equals(codigo));
-        eliminado = historialTutorias.removeIf(t -> t.getProfesor().getCodigo().equals(codigo));
-        return eliminado;
+        return profesoresDisponibles.removeIf(p -> p.getCodigo().equals(codigo));
     }
+
 }

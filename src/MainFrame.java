@@ -1,41 +1,43 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.awt.event.*;
 
 public class MainFrame extends JFrame {
-
     private GestionApoyos sistema;
     private JPanel panelCentral;
 
-    public MainFrame() {
-        sistema = new GestionApoyos();
+    // Componentes para agregar estudiante/profesor
+    private JTextField txtNombre, txtExp, txtMateria;
+    private JComboBox<String> cbHoras, cbRegion;
+
+    public MainFrame(GestionApoyos sistema) {
+        this.sistema = sistema;
         setTitle("Gestión de Tutorías - Proyecto Final");
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(820, 540);
-        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         // Menú lateral
         JPanel panelMenu = new JPanel(new GridLayout(10, 1, 10, 10));
-        panelMenu.setBorder(BorderFactory.createEmptyBorder(30, 10, 30, 10));
+        panelMenu.setPreferredSize(new Dimension(200, 0));
+
         JButton btnEstudiante = new JButton("Estudiante");
         JButton btnProfesor = new JButton("Profesor");
-        JButton btnAsignarTutoria = new JButton("Asignar Tutoría");
+        JButton btnAgregarProfesor = new JButton("Agregar Profesor");
         JButton btnSolicitudes = new JButton("Solicitudes");
-        JButton btnProfesores = new JButton("Profesores Registrados");
-        JButton btnEstudiantesReg = new JButton("Estudiantes Registrados");
+        JButton btnProfesoresReg = new JButton("Profesores Registrados");
         JButton btnHistorialTutorias = new JButton("Historial de Tutorías");
+        JButton btnAgregarRecurso = new JButton("Agregar Recurso Académico");
         JButton btnEliminarEstudiante = new JButton("Eliminar Estudiante");
         JButton btnEliminarProfesor = new JButton("Eliminar Profesor");
 
         panelMenu.add(btnEstudiante);
         panelMenu.add(btnProfesor);
-        panelMenu.add(btnAsignarTutoria);
+        panelMenu.add(btnAgregarProfesor);
         panelMenu.add(btnSolicitudes);
-        panelMenu.add(btnProfesores);
-        panelMenu.add(btnEstudiantesReg);
+        panelMenu.add(btnProfesoresReg);
         panelMenu.add(btnHistorialTutorias);
+        panelMenu.add(btnAgregarRecurso);
         panelMenu.add(btnEliminarEstudiante);
         panelMenu.add(btnEliminarProfesor);
 
@@ -43,352 +45,288 @@ public class MainFrame extends JFrame {
 
         // Panel central inicial
         panelCentral = new JPanel();
-        panelCentral.add(new JLabel("Selecciona una opción del menú"));
+        panelCentral.add(new JLabel("Selecciona una opción del menú."));
         add(panelCentral, BorderLayout.CENTER);
 
-        // Acciones de menú
-        btnEstudiante.addActionListener(e -> mostrarPanelEstudiante());
-        btnProfesor.addActionListener(e -> mostrarPanelProfesor());
-        btnAsignarTutoria.addActionListener(e -> mostrarPanelAsignarTutoria());
-        btnSolicitudes.addActionListener(e -> mostrarPanelSolicitudes());
-        btnProfesores.addActionListener(e -> mostrarPanelProfesores());
-        btnEstudiantesReg.addActionListener(e -> mostrarPanelEstudiantesRegistrados());
-        btnHistorialTutorias.addActionListener(e -> mostrarPanelHistorialTutorias());
+        // Eventos
+        btnEstudiante.addActionListener(e -> mostrarPanelAgregarEstudiante());
+        btnProfesor.addActionListener(e -> mostrarPanelAgregarProfesor());
+        btnAgregarProfesor.addActionListener(e -> mostrarPanelAgregarProfesor());
+        btnSolicitudes.addActionListener(e -> mostrarSolicitudes());
+        btnProfesoresReg.addActionListener(e -> mostrarProfesoresRegistrados());
+        btnHistorialTutorias.addActionListener(e -> mostrarHistorialTutorias());
+        btnAgregarRecurso.addActionListener(e -> mostrarPanelAgregarRecurso());
         btnEliminarEstudiante.addActionListener(e -> mostrarPanelEliminarEstudiante());
         btnEliminarProfesor.addActionListener(e -> mostrarPanelEliminarProfesor());
-
-        setVisible(true);
     }
 
-    // PANEL: Estudiante
-    private void mostrarPanelEstudiante() {
+    private void mostrarPanelAgregarEstudiante() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new GridLayout(2, 1, 10, 10));
+        panelCentral.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        JPanel panelAgregar = new JPanel(new GridLayout(5, 2, 5, 5));
-        panelAgregar.setBorder(BorderFactory.createTitledBorder("Agregar Estudiante"));
         JLabel lblNombre = new JLabel("Nombre:");
-        JTextField txtNombre = new JTextField();
+        txtNombre = new JTextField(15);
+
         JLabel lblEdad = new JLabel("Edad:");
-        JTextField txtEdad = new JTextField();
+        txtExp = new JTextField(5);
+
         JLabel lblMateria = new JLabel("Materia:");
-        JTextField txtMateria = new JTextField();
+        txtMateria = new JTextField(10);
+
         JLabel lblHoras = new JLabel("Horas:");
-        String[] opcionesHoras = {"1 hora", "2 horas", "3 horas"};
-        JComboBox<String> cmbHoras = new JComboBox<>(opcionesHoras);
+        cbHoras = new JComboBox<>(new String[] {"1 hora", "2 horas", "3 horas"});
+
+        JLabel lblRegion = new JLabel("Región:");
+        cbRegion = new JComboBox<>(new String[] {"Costa", "Sierra", "Oriente", "Insular"});
+
         JButton btnGuardar = new JButton("Guardar");
-        JLabel lblResultado = new JLabel();
+        JButton btnCancelar = new JButton("Cancelar");
 
-        btnGuardar.addActionListener(e -> {
+        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblNombre, gbc);
+        gbc.gridx = 1; panelCentral.add(txtNombre, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblEdad, gbc);
+        gbc.gridx = 1; panelCentral.add(txtExp, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblMateria, gbc);
+        gbc.gridx = 1; panelCentral.add(txtMateria, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblHoras, gbc);
+        gbc.gridx = 1; panelCentral.add(cbHoras, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblRegion, gbc);
+        gbc.gridx = 1; panelCentral.add(cbRegion, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnGuardar, gbc);
+        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
+
+        btnGuardar.addActionListener(a -> {
             try {
-                Estudiante est = new Estudiante(
-                        txtNombre.getText(),
-                        Integer.parseInt(txtEdad.getText()),
-                        txtMateria.getText(),
-                        (String) cmbHoras.getSelectedItem()
-                );
-                sistema.agregarSolicitud(est);
-                lblResultado.setText("Estudiante agregado (código: " + est.getCodigo() + ")");
-                txtNombre.setText(""); txtEdad.setText(""); txtMateria.setText(""); cmbHoras.setSelectedIndex(0);
+                String nombre = txtNombre.getText().trim();
+                int edad = Integer.parseInt(txtExp.getText().trim());
+                String materia = txtMateria.getText().trim();
+                String horas = (String) cbHoras.getSelectedItem();
+                String region = (String) cbRegion.getSelectedItem();
+
+                Estudiante est = new Estudiante(nombre, edad, materia, horas, region);
+                sistema.agregarEstudiante(est);
+
+                JOptionPane.showMessageDialog(this, "Estudiante agregado correctamente.");
+                panelCentral.removeAll();
+                panelCentral.add(new JLabel("Estudiante registrado."));
+                panelCentral.revalidate();
+                panelCentral.repaint();
             } catch (Exception ex) {
-                lblResultado.setText("Datos inválidos. Intenta de nuevo.");
+                JOptionPane.showMessageDialog(this, "Datos inválidos: " + ex.getMessage());
             }
         });
 
-        panelAgregar.add(lblNombre);   panelAgregar.add(txtNombre);
-        panelAgregar.add(lblEdad);     panelAgregar.add(txtEdad);
-        panelAgregar.add(lblMateria);  panelAgregar.add(txtMateria);
-        panelAgregar.add(lblHoras);    panelAgregar.add(cmbHoras);
-        panelAgregar.add(btnGuardar);  panelAgregar.add(lblResultado);
-
-        JPanel panelUltima = new JPanel(new GridLayout(2, 2, 5, 5));
-        panelUltima.setBorder(BorderFactory.createTitledBorder("Ver Última Tutoría Tomada"));
-
-        JLabel lblCodigoEst = new JLabel("Código Estudiante:");
-        JTextField txtCodigoEst = new JTextField();
-        JButton btnBuscar = new JButton("Buscar");
-        JTextArea areaUltima = new JTextArea(3, 30);
-        areaUltima.setEditable(false);
-
-        btnBuscar.addActionListener(e -> {
-            String codigo = txtCodigoEst.getText().trim();
-            Tutoria ultima = null;
-            for (int i = sistema.getHistorialTutorias().size() - 1; i >= 0; i--) {
-                Tutoria t = sistema.getHistorialTutorias().get(i);
-                if (t.getEstudiante().getCodigo().equals(codigo)) {
-                    ultima = t;
-                    break;
-                }
-            }
-            if (ultima != null) {
-                areaUltima.setText("Estudiante: " + ultima.getEstudiante().getNombre() + " (" + ultima.getEstudiante().getCodigo() + ")\n" +
-                        "Profesor: " + ultima.getProfesor().getNombre() + " (" + ultima.getProfesor().getCodigo() + ")\n" +
-                        "Materia: " + ultima.getEstudiante().getMateria() + "\n" +
-                        "Horas: " + ultima.getEstudiante().getHoras());
-            } else {
-                areaUltima.setText("No se encontró tutoría para ese código.");
-            }
+        btnCancelar.addActionListener(a -> {
+            panelCentral.removeAll();
+            panelCentral.add(new JLabel("Operación cancelada."));
+            panelCentral.revalidate();
+            panelCentral.repaint();
         });
-
-        panelUltima.add(lblCodigoEst); panelUltima.add(txtCodigoEst);
-        panelUltima.add(btnBuscar);    panelUltima.add(new JScrollPane(areaUltima));
-
-        panelCentral.add(panelAgregar);
-        panelCentral.add(panelUltima);
 
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    // PANEL: Profesor
-    private void mostrarPanelProfesor() {
+    private void mostrarPanelAgregarProfesor() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new GridLayout(2, 1, 10, 10));
-
-        JPanel panelAgregar = new JPanel(new GridLayout(5, 2, 5, 5));
-        panelAgregar.setBorder(BorderFactory.createTitledBorder("Agregar Profesor"));
+        panelCentral.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.anchor = GridBagConstraints.WEST;
 
         JLabel lblNombre = new JLabel("Nombre:");
-        JTextField txtNombre = new JTextField();
-        JLabel lblExperiencia = new JLabel("Experiencia:");
-        JTextField txtExperiencia = new JTextField();
-        JLabel lblMateria = new JLabel("Materia a dar:");
-        JTextField txtMateria = new JTextField();
+        txtNombre = new JTextField(15);
+
+        JLabel lblExp = new JLabel("Experiencia:");
+        txtExp = new JTextField(10);
+
+        JLabel lblMateria = new JLabel("Materia:");
+        txtMateria = new JTextField(10);
+
         JLabel lblHoras = new JLabel("Horas:");
-        String[] opcionesHoras = {"1 hora", "2 horas", "3 horas"};
-        JComboBox<String> cmbHoras = new JComboBox<>(opcionesHoras);
+        cbHoras = new JComboBox<>(new String[] {"1 hora", "2 horas", "3 horas"});
+
+        JLabel lblRegion = new JLabel("Región:");
+        cbRegion = new JComboBox<>(new String[] {"Costa", "Sierra", "Oriente", "Insular"});
+
         JButton btnGuardar = new JButton("Guardar");
-        JLabel lblResultado = new JLabel();
+        JButton btnCancelar = new JButton("Cancelar");
 
-        btnGuardar.addActionListener(e -> {
-            Profesor prof = new Profesor(
-                    txtNombre.getText(),
-                    txtExperiencia.getText(),
-                    txtMateria.getText(),
-                    (String) cmbHoras.getSelectedItem()
-            );
-            sistema.agregarProfesor(prof);
-            lblResultado.setText("Profesor registrado (código: " + prof.getCodigo() + ")");
-            txtNombre.setText(""); txtExperiencia.setText(""); txtMateria.setText(""); cmbHoras.setSelectedIndex(0);
+        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblNombre, gbc);
+        gbc.gridx = 1; panelCentral.add(txtNombre, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblExp, gbc);
+        gbc.gridx = 1; panelCentral.add(txtExp, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblMateria, gbc);
+        gbc.gridx = 1; panelCentral.add(txtMateria, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblHoras, gbc);
+        gbc.gridx = 1; panelCentral.add(cbHoras, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblRegion, gbc);
+        gbc.gridx = 1; panelCentral.add(cbRegion, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnGuardar, gbc);
+        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
+
+        btnGuardar.addActionListener(a -> {
+            try {
+                String nombre = txtNombre.getText().trim();
+                String experiencia = txtExp.getText().trim();
+                String materia = txtMateria.getText().trim();
+                String horas = (String) cbHoras.getSelectedItem();
+                String region = (String) cbRegion.getSelectedItem();
+
+                Profesor prof = new Profesor(nombre, experiencia, materia, horas, region);
+                sistema.agregarProfesor(prof);
+
+                JOptionPane.showMessageDialog(this, "Profesor agregado correctamente.");
+                panelCentral.removeAll();
+                panelCentral.add(new JLabel("Profesor registrado."));
+                panelCentral.revalidate();
+                panelCentral.repaint();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Datos inválidos: " + ex.getMessage());
+            }
         });
 
-        panelAgregar.add(lblNombre);       panelAgregar.add(txtNombre);
-        panelAgregar.add(lblExperiencia);  panelAgregar.add(txtExperiencia);
-        panelAgregar.add(lblMateria);      panelAgregar.add(txtMateria);
-        panelAgregar.add(lblHoras);        panelAgregar.add(cmbHoras);
-        panelAgregar.add(btnGuardar);      panelAgregar.add(lblResultado);
-
-        JPanel panelHistorial = new JPanel(new GridLayout(2, 2, 5, 5));
-        panelHistorial.setBorder(BorderFactory.createTitledBorder("Ver Historial Tutorías (por Código)"));
-
-        JLabel lblCodigoProf = new JLabel("Código Profesor:");
-        JTextField txtCodigoProf = new JTextField();
-        JButton btnBuscar = new JButton("Buscar");
-        JTextArea areaHistorial = new JTextArea(3, 30);
-        areaHistorial.setEditable(false);
-
-        btnBuscar.addActionListener(e -> {
-            String codigo = txtCodigoProf.getText().trim();
-            StringBuilder sb = new StringBuilder();
-            for (Tutoria t : sistema.getHistorialTutorias()) {
-                if (t.getProfesor().getCodigo().equals(codigo)) {
-                    sb.append("Estudiante: ").append(t.getEstudiante().getNombre())
-                            .append(" | Materia: ").append(t.getEstudiante().getMateria())
-                            .append(" | Horas: ").append(t.getEstudiante().getHoras()).append("\n");
-                }
-            }
-            if (sb.length() == 0) sb.append("No se encontró historial para ese código.");
-            areaHistorial.setText(sb.toString());
+        btnCancelar.addActionListener(a -> {
+            panelCentral.removeAll();
+            panelCentral.add(new JLabel("Operación cancelada."));
+            panelCentral.revalidate();
+            panelCentral.repaint();
         });
 
-        panelHistorial.add(lblCodigoProf); panelHistorial.add(txtCodigoProf);
-        panelHistorial.add(btnBuscar);     panelHistorial.add(new JScrollPane(areaHistorial));
-
-        panelCentral.add(panelAgregar);
-        panelCentral.add(panelHistorial);
-
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    // PANEL: Asignar tutoría
-    private void mostrarPanelAsignarTutoria() {
+    private void mostrarSolicitudes() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
-        Tutoria t = sistema.asignarTutor();
-        JTextArea area = new JTextArea();
+        JTextArea area = new JTextArea(sistema.listarSolicitudes());
         area.setEditable(false);
-        if (t != null) {
-            area.setText("Tutoría asignada:\nEstudiante: " + t.getEstudiante().getNombre() +
-                    " (" + t.getEstudiante().getCodigo() + ")\nProfesor: " + t.getProfesor().getNombre() +
-                    " (" + t.getProfesor().getCodigo() + ")\nMateria: " + t.getEstudiante().getMateria() +
-                    "\nHoras: " + t.getEstudiante().getHoras());
-        } else {
-            area.setText("No hay estudiantes o profesores disponibles para asignar.");
-        }
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
+        panelCentral.add(new JScrollPane(area));
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    // PANEL: Solicitudes de estudiantes
-    private void mostrarPanelSolicitudes() {
+    private void mostrarProfesoresRegistrados() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
-        StringBuilder sb = new StringBuilder();
-        if (sistema.getColaSolicitudes().isEmpty()) {
-            sb.append("No hay solicitudes pendientes.");
-        } else {
-            for (Estudiante e : sistema.getColaSolicitudes()) {
-                sb.append(e).append("\n");
-            }
-        }
-        JTextArea area = new JTextArea(sb.toString());
+        JTextArea area = new JTextArea(sistema.listarProfesoresRegistrados());
         area.setEditable(false);
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
+        panelCentral.add(new JScrollPane(area));
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    // PANEL: Profesores registrados
-    private void mostrarPanelProfesores() {
+    private void mostrarHistorialTutorias() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
-        StringBuilder sb = new StringBuilder();
-        ArrayList<Profesor> profesores = sistema.getProfesoresDisponibles();
-        if (profesores.isEmpty()) {
-            sb.append("No hay profesores registrados.");
-        } else {
-            for (Profesor p : profesores) {
-                sb.append(p).append("\n");
-            }
-        }
-        JTextArea area = new JTextArea(sb.toString());
+        JTextArea area = new JTextArea(sistema.listarHistorialTutorias());
         area.setEditable(false);
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
+        panelCentral.add(new JScrollPane(area));
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    // PANEL: Estudiantes registrados (únicos)
-    private void mostrarPanelEstudiantesRegistrados() {
+    private void mostrarPanelAgregarRecurso() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
+        panelCentral.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        HashSet<String> codigosMostrados = new HashSet<>();
-        StringBuilder sb = new StringBuilder();
+        JLabel lblTitulo = new JLabel("Título:");
+        JTextField txtTitulo = new JTextField(15);
 
-        for (Estudiante e : sistema.getColaSolicitudes()) {
-            if (codigosMostrados.add(e.getCodigo())) {
-                sb.append(e).append("\n");
+        JLabel lblDescripcion = new JLabel("Descripción:");
+        JTextField txtDescripcion = new JTextField(20);
+
+        JLabel lblEnlace = new JLabel("Enlace:");
+        JTextField txtEnlace = new JTextField(20);
+
+        JButton btnGuardar = new JButton("Guardar");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblTitulo, gbc);
+        gbc.gridx = 1; panelCentral.add(txtTitulo, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblDescripcion, gbc);
+        gbc.gridx = 1; panelCentral.add(txtDescripcion, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblEnlace, gbc);
+        gbc.gridx = 1; panelCentral.add(txtEnlace, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnGuardar, gbc);
+        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
+
+        btnGuardar.addActionListener(a -> {
+            try {
+                String titulo = txtTitulo.getText().trim();
+                String descripcion = txtDescripcion.getText().trim();
+                String enlace = txtEnlace.getText().trim();
+
+                RecursoAcademico recurso = new RecursoAcademico(titulo, descripcion, enlace);
+                sistema.agregarRecursoAcademico(recurso);
+
+                JOptionPane.showMessageDialog(this, "Recurso agregado correctamente.");
+                panelCentral.removeAll();
+                panelCentral.add(new JLabel("Recurso agregado."));
+                panelCentral.revalidate();
+                panelCentral.repaint();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Datos inválidos: " + ex.getMessage());
             }
-        }
-        for (Tutoria t : sistema.getHistorialTutorias()) {
-            Estudiante e = t.getEstudiante();
-            if (codigosMostrados.add(e.getCodigo())) {
-                sb.append(e).append("\n");
-            }
-        }
+        });
 
-        if (sb.length() == 0) sb.append("No hay estudiantes registrados.");
-        JTextArea area = new JTextArea(sb.toString());
-        area.setEditable(false);
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
+        btnCancelar.addActionListener(a -> {
+            panelCentral.removeAll();
+            panelCentral.add(new JLabel("Operación cancelada."));
+            panelCentral.revalidate();
+            panelCentral.repaint();
+        });
+
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    // PANEL: Historial de tutorías
-    private void mostrarPanelHistorialTutorias() {
-        panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
-        StringBuilder sb = new StringBuilder();
-        ArrayList<Tutoria> historial = sistema.getHistorialTutorias();
-        if (historial.isEmpty()) {
-            sb.append("No hay tutorías asignadas aún.");
-        } else {
-            int cont = 1;
-            for (Tutoria t : historial) {
-                sb.append("Tutoría #").append(cont++).append(":\n")
-                        .append("Estudiante: ").append(t.getEstudiante().getNombre()).append(" (").append(t.getEstudiante().getCodigo()).append(")\n")
-                        .append("Profesor: ").append(t.getProfesor().getNombre()).append(" (").append(t.getProfesor().getCodigo()).append(")\n")
-                        .append("Materia: ").append(t.getEstudiante().getMateria()).append("\n")
-                        .append("Horas: ").append(t.getEstudiante().getHoras()).append("\n")
-                        .append("-----------------------------------------------------\n");
-            }
-        }
-        JTextArea area = new JTextArea(sb.toString());
-        area.setEditable(false);
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
-        panelCentral.revalidate();
-        panelCentral.repaint();
-    }
-
-    // PANEL: Eliminar Estudiante por código
     private void mostrarPanelEliminarEstudiante() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
+        panelCentral.setLayout(new FlowLayout());
+        JTextField txtCodigo = new JTextField(10);
+        JButton btnEliminar = new JButton("Eliminar");
+        panelCentral.add(new JLabel("Código de estudiante:"));
+        panelCentral.add(txtCodigo);
+        panelCentral.add(btnEliminar);
 
-        JPanel form = new JPanel(new FlowLayout());
-        JLabel lbl = new JLabel("Código del estudiante a eliminar:");
-        JTextField txt = new JTextField(10);
-        JButton btn = new JButton("Eliminar");
-        JLabel resultado = new JLabel();
-
-        btn.addActionListener(e -> {
-            String codigo = txt.getText().trim();
-            if (!codigo.isEmpty()) {
-                boolean eliminado = sistema.eliminarEstudiantePorCodigo(codigo);
-                resultado.setText(eliminado ? "Estudiante eliminado correctamente." : "No se encontró ese código o ya fue eliminado.");
-            } else {
-                resultado.setText("Ingrese un código válido.");
-            }
+        btnEliminar.addActionListener(e -> {
+            String codigo = txtCodigo.getText().trim();
+            boolean ok = sistema.eliminarEstudiantePorCodigo(codigo);
+            String msg = ok ? "Estudiante eliminado." : "Estudiante no encontrado.";
+            JOptionPane.showMessageDialog(this, msg);
         });
-
-        form.add(lbl);
-        form.add(txt);
-        form.add(btn);
-
-        panelCentral.add(form, BorderLayout.NORTH);
-        panelCentral.add(resultado, BorderLayout.CENTER);
 
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    // PANEL: Eliminar Profesor por código
     private void mostrarPanelEliminarProfesor() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
+        panelCentral.setLayout(new FlowLayout());
+        JTextField txtCodigo = new JTextField(10);
+        JButton btnEliminar = new JButton("Eliminar");
+        panelCentral.add(new JLabel("Código de profesor:"));
+        panelCentral.add(txtCodigo);
+        panelCentral.add(btnEliminar);
 
-        JPanel form = new JPanel(new FlowLayout());
-        JLabel lbl = new JLabel("Código del profesor a eliminar:");
-        JTextField txt = new JTextField(10);
-        JButton btn = new JButton("Eliminar");
-        JLabel resultado = new JLabel();
-
-        btn.addActionListener(e -> {
-            String codigo = txt.getText().trim();
-            if (!codigo.isEmpty()) {
-                boolean eliminado = sistema.eliminarProfesorPorCodigo(codigo);
-                resultado.setText(eliminado ? "Profesor eliminado correctamente." : "No se encontró ese código o ya fue eliminado.");
-            } else {
-                resultado.setText("Ingrese un código válido.");
-            }
+        btnEliminar.addActionListener(e -> {
+            String codigo = txtCodigo.getText().trim();
+            boolean ok = sistema.eliminarProfesorPorCodigo(codigo);
+            String msg = ok ? "Profesor eliminado." : "Profesor no encontrado.";
+            JOptionPane.showMessageDialog(this, msg);
         });
-
-        form.add(lbl);
-        form.add(txt);
-        form.add(btn);
-
-        panelCentral.add(form, BorderLayout.NORTH);
-        panelCentral.add(resultado, BorderLayout.CENTER);
 
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MainFrame::new);
+        GestionApoyos sistema = new GestionApoyos(); // asegúrate de que tienes este constructor
+        SwingUtilities.invokeLater(() -> new MainFrame(sistema).setVisible(true));
     }
 }

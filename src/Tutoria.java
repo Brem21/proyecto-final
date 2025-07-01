@@ -1,22 +1,15 @@
 public class Tutoria {
     private Estudiante estudiante;
     private Profesor profesor;
+    private String fecha;
 
-    public Tutoria(Estudiante estudiante, Profesor profesor) {
-        this.estudiante = estudiante;
-        this.profesor = profesor;
+    public Tutoria(Estudiante e, Profesor p, String fecha) {
+        this.estudiante = e;
+        this.profesor = p;
+        this.fecha = fecha;
     }
 
-    public Estudiante getEstudiante() {
-        return estudiante;
-    }
-
-    public Profesor getProfesor() {
-        return profesor;
-    }
-
-    @Override
     public String toString() {
-        return "Estudiante: " + estudiante.getNombre() + " | Profesor: " + profesor.getNombre();
+        return "Tutoria: " + estudiante + " con " + profesor + " en " + fecha;
     }
 }
