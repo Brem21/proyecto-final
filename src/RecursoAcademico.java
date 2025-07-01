@@ -9,9 +9,8 @@ public class RecursoAcademico {
         this.enlace = enlace;
     }
 
+    @Override
     public String toString() {
         return "Título: " + titulo + ", Descripción: " + descripcion + ", Enlace: " + enlace;
     }
-
-    // Getters y setters si los necesitas...
 }

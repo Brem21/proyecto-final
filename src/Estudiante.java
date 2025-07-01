@@ -17,7 +17,9 @@ public class Estudiante {
     }
 
     public String getCodigo() { return codigo; }
+    public String getRegion() { return region; }
 
+    @Override
     public String toString() {
         return codigo + " - " + nombre + " (" + materia + ", región: " + region + ")";
     }

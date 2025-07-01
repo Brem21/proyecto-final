@@ -6,9 +6,9 @@ public class MainFrame extends JFrame {
     private GestionApoyos sistema;
     private JPanel panelCentral;
 
-    // Componentes para agregar estudiante/profesor
     private JTextField txtNombre, txtExp, txtMateria;
-    private JComboBox<String> cbHoras, cbRegion;
+    private JComboBox<String> cbHoras;
+    private JComboBox<Region> cbRegion;
 
     public MainFrame(GestionApoyos sistema) {
         this.sistema = sistema;
@@ -17,13 +17,12 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Menú lateral
         JPanel panelMenu = new JPanel(new GridLayout(10, 1, 10, 10));
         panelMenu.setPreferredSize(new Dimension(200, 0));
 
         JButton btnEstudiante = new JButton("Estudiante");
-        JButton btnProfesor = new JButton("Profesor");
         JButton btnAgregarProfesor = new JButton("Agregar Profesor");
+        JButton btnCrearTutoria = new JButton("Crear Tutoría");
         JButton btnSolicitudes = new JButton("Solicitudes");
         JButton btnProfesoresReg = new JButton("Profesores Registrados");
         JButton btnHistorialTutorias = new JButton("Historial de Tutorías");
@@ -32,8 +31,8 @@ public class MainFrame extends JFrame {
         JButton btnEliminarProfesor = new JButton("Eliminar Profesor");
 
         panelMenu.add(btnEstudiante);
-        panelMenu.add(btnProfesor);
         panelMenu.add(btnAgregarProfesor);
+        panelMenu.add(btnCrearTutoria);
         panelMenu.add(btnSolicitudes);
         panelMenu.add(btnProfesoresReg);
         panelMenu.add(btnHistorialTutorias);
@@ -43,15 +42,13 @@ public class MainFrame extends JFrame {
 
         add(panelMenu, BorderLayout.WEST);
 
-        // Panel central inicial
         panelCentral = new JPanel();
         panelCentral.add(new JLabel("Selecciona una opción del menú."));
         add(panelCentral, BorderLayout.CENTER);
 
-        // Eventos
         btnEstudiante.addActionListener(e -> mostrarPanelAgregarEstudiante());
-        btnProfesor.addActionListener(e -> mostrarPanelAgregarProfesor());
         btnAgregarProfesor.addActionListener(e -> mostrarPanelAgregarProfesor());
+        btnCrearTutoria.addActionListener(e -> mostrarPanelCrearTutoria());
         btnSolicitudes.addActionListener(e -> mostrarSolicitudes());
         btnProfesoresReg.addActionListener(e -> mostrarProfesoresRegistrados());
         btnHistorialTutorias.addActionListener(e -> mostrarHistorialTutorias());
@@ -80,7 +77,7 @@ public class MainFrame extends JFrame {
         cbHoras = new JComboBox<>(new String[] {"1 hora", "2 horas", "3 horas"});
 
         JLabel lblRegion = new JLabel("Región:");
-        cbRegion = new JComboBox<>(new String[] {"Costa", "Sierra", "Oriente", "Insular"});
+        cbRegion = new JComboBox<>(Region.REGIONES);
 
         JButton btnGuardar = new JButton("Guardar");
         JButton btnCancelar = new JButton("Cancelar");
@@ -104,7 +101,7 @@ public class MainFrame extends JFrame {
                 int edad = Integer.parseInt(txtExp.getText().trim());
                 String materia = txtMateria.getText().trim();
                 String horas = (String) cbHoras.getSelectedItem();
-                String region = (String) cbRegion.getSelectedItem();
+                String region = ((Region) cbRegion.getSelectedItem()).getNombre();
 
                 Estudiante est = new Estudiante(nombre, edad, materia, horas, region);
                 sistema.agregarEstudiante(est);
@@ -150,7 +147,7 @@ public class MainFrame extends JFrame {
         cbHoras = new JComboBox<>(new String[] {"1 hora", "2 horas", "3 horas"});
 
         JLabel lblRegion = new JLabel("Región:");
-        cbRegion = new JComboBox<>(new String[] {"Costa", "Sierra", "Oriente", "Insular"});
+        cbRegion = new JComboBox<>(Region.REGIONES);
 
         JButton btnGuardar = new JButton("Guardar");
         JButton btnCancelar = new JButton("Cancelar");
@@ -174,7 +171,7 @@ public class MainFrame extends JFrame {
                 String experiencia = txtExp.getText().trim();
                 String materia = txtMateria.getText().trim();
                 String horas = (String) cbHoras.getSelectedItem();
-                String region = (String) cbRegion.getSelectedItem();
+                String region = ((Region) cbRegion.getSelectedItem()).getNombre();
 
                 Profesor prof = new Profesor(nombre, experiencia, materia, horas, region);
                 sistema.agregarProfesor(prof);
@@ -200,11 +197,59 @@ public class MainFrame extends JFrame {
         panelCentral.repaint();
     }
 
+    private void mostrarPanelCrearTutoria() {
+        panelCentral.removeAll();
+        panelCentral.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        JLabel lblEstudiante = new JLabel("Código Estudiante:");
+        JTextField txtCodEst = new JTextField(10);
+
+        JLabel lblProfesor = new JLabel("Código Profesor:");
+        JTextField txtCodProf = new JTextField(10);
+
+        JButton btnAsignar = new JButton("Asignar Tutoría");
+        JButton btnCancelar = new JButton("Cancelar");
+
+        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblEstudiante, gbc);
+        gbc.gridx = 1; panelCentral.add(txtCodEst, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblProfesor, gbc);
+        gbc.gridx = 1; panelCentral.add(txtCodProf, gbc);
+        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnAsignar, gbc);
+        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
+
+        btnAsignar.addActionListener(e -> {
+            String codEst = txtCodEst.getText().trim();
+            String codProf = txtCodProf.getText().trim();
+
+            String resultado = sistema.crearTutoria(codEst, codProf);
+            JOptionPane.showMessageDialog(this, resultado);
+
+            if (resultado.equals("Tutoría asignada exitosamente.")) {
+                txtCodEst.setText("");
+                txtCodProf.setText("");
+            }
+        });
+
+        btnCancelar.addActionListener(a -> {
+            panelCentral.removeAll();
+            panelCentral.add(new JLabel("Operación cancelada."));
+            panelCentral.revalidate();
+            panelCentral.repaint();
+        });
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
     private void mostrarSolicitudes() {
         panelCentral.removeAll();
         JTextArea area = new JTextArea(sistema.listarSolicitudes());
         area.setEditable(false);
-        panelCentral.add(new JScrollPane(area));
+        panelCentral.setLayout(new BorderLayout());
+        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
         panelCentral.revalidate();
         panelCentral.repaint();
     }
@@ -213,7 +258,8 @@ public class MainFrame extends JFrame {
         panelCentral.removeAll();
         JTextArea area = new JTextArea(sistema.listarProfesoresRegistrados());
         area.setEditable(false);
-        panelCentral.add(new JScrollPane(area));
+        panelCentral.setLayout(new BorderLayout());
+        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
         panelCentral.revalidate();
         panelCentral.repaint();
     }
@@ -222,7 +268,8 @@ public class MainFrame extends JFrame {
         panelCentral.removeAll();
         JTextArea area = new JTextArea(sistema.listarHistorialTutorias());
         area.setEditable(false);
-        panelCentral.add(new JScrollPane(area));
+        panelCentral.setLayout(new BorderLayout());
+        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
         panelCentral.revalidate();
         panelCentral.repaint();
     }
@@ -326,7 +373,8 @@ public class MainFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        GestionApoyos sistema = new GestionApoyos(); // asegúrate de que tienes este constructor
+        GestionApoyos sistema = new GestionApoyos();
         SwingUtilities.invokeLater(() -> new MainFrame(sistema).setVisible(true));
     }
 }
+

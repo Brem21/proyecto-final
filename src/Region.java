@@ -1,5 +1,4 @@
 public class Region {
-    // Lista de regiones predefinidas como objetos Region
     public static final Region[] REGIONES = {
             new Region("Costa"),
             new Region("Sierra"),
@@ -19,16 +18,16 @@ public class Region {
 
     @Override
     public String toString() {
-        return nombre; // Esto permite que el JComboBox muestre el nombre directamente
+        return nombre;
     }
 
-    // Método auxiliar para buscar una Región por su nombre
     public static Region buscarRegionPorNombre(String nombre) {
         for (Region r : REGIONES) {
             if (r.getNombre().equalsIgnoreCase(nombre)) {
                 return r;
             }
         }
-        return null; // Si no se encuentra, retorna null
+        return null;
     }
 }
+

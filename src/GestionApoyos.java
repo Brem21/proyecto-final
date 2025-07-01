@@ -1,9 +1,10 @@
 import java.util.*;
+
 public class GestionApoyos {
     private Queue<Estudiante> colaSolicitudes;
     private ArrayList<Profesor> profesoresDisponibles;
     private ArrayList<Tutoria> historialTutorias;
-    private ArrayList<RecursoAcademico> recursosAcademicos; // Agregado
+    private ArrayList<RecursoAcademico> recursosAcademicos;
 
     public GestionApoyos() {
         colaSolicitudes = new LinkedList<>();
@@ -59,7 +60,7 @@ public class GestionApoyos {
         }
         return sb.toString();
     }
-    // ...
+
     public boolean eliminarEstudiantePorCodigo(String codigo) {
         return colaSolicitudes.removeIf(e -> e.getCodigo().equals(codigo));
     }
@@ -68,4 +69,39 @@ public class GestionApoyos {
         return profesoresDisponibles.removeIf(p -> p.getCodigo().equals(codigo));
     }
 
+    public String crearTutoria(String codEst, String codProf) {
+        Estudiante estudiante = null;
+        for (Estudiante e : colaSolicitudes) {
+            if (e.getCodigo().equals(codEst)) {
+                estudiante = e;
+                break;
+            }
+        }
+
+        if (estudiante == null) return "Estudiante no encontrado en solicitudes.";
+
+        Profesor profesor = null;
+        for (Profesor p : profesoresDisponibles) {
+            if (p.getCodigo().equals(codProf)) {
+                profesor = p;
+                break;
+            }
+        }
+
+        if (profesor == null) return "Profesor no encontrado.";
+
+        if (profesor.isOcupado()) {
+            return "El profesor ya tiene una tutoría asignada.";
+        }
+
+        if (!profesor.getRegion().equalsIgnoreCase(estudiante.getRegion())) {
+            return "El profesor no pertenece a la misma región que el estudiante.";
+        }
+
+        Tutoria t = new Tutoria(estudiante, profesor);
+        historialTutorias.add(t);
+        profesor.setOcupado(true);
+        colaSolicitudes.remove(estudiante);
+        return "Tutoría asignada exitosamente.";
+    }
 }
