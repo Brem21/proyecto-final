@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class MainFrame extends JFrame {
     private GestionApoyos sistema;
@@ -17,8 +16,8 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel panelMenu = new JPanel(new GridLayout(10, 1, 10, 10));
-        panelMenu.setPreferredSize(new Dimension(200, 0));
+        // --- Panel Menú ---
+        JPanel panelMenu = new JPanel(new GridLayout(11, 1, 10, 10)); // Ahora 11 filas
 
         JButton btnEstudiante = new JButton("Estudiante");
         JButton btnAgregarProfesor = new JButton("Agregar Profesor");
@@ -26,6 +25,7 @@ public class MainFrame extends JFrame {
         JButton btnSolicitudes = new JButton("Solicitudes");
         JButton btnProfesoresReg = new JButton("Profesores Registrados");
         JButton btnHistorialTutorias = new JButton("Historial de Tutorías");
+        JButton btnMostrarRecursos = new JButton("Mostrar Recursos");
         JButton btnAgregarRecurso = new JButton("Agregar Recurso Académico");
         JButton btnEliminarEstudiante = new JButton("Eliminar Estudiante");
         JButton btnEliminarProfesor = new JButton("Eliminar Profesor");
@@ -36,6 +36,7 @@ public class MainFrame extends JFrame {
         panelMenu.add(btnSolicitudes);
         panelMenu.add(btnProfesoresReg);
         panelMenu.add(btnHistorialTutorias);
+        panelMenu.add(btnMostrarRecursos); // <-- Nuevo botón
         panelMenu.add(btnAgregarRecurso);
         panelMenu.add(btnEliminarEstudiante);
         panelMenu.add(btnEliminarProfesor);
@@ -46,12 +47,14 @@ public class MainFrame extends JFrame {
         panelCentral.add(new JLabel("Selecciona una opción del menú."));
         add(panelCentral, BorderLayout.CENTER);
 
+        // --- Listeners ---
         btnEstudiante.addActionListener(e -> mostrarPanelAgregarEstudiante());
         btnAgregarProfesor.addActionListener(e -> mostrarPanelAgregarProfesor());
         btnCrearTutoria.addActionListener(e -> mostrarPanelCrearTutoria());
         btnSolicitudes.addActionListener(e -> mostrarSolicitudes());
         btnProfesoresReg.addActionListener(e -> mostrarProfesoresRegistrados());
         btnHistorialTutorias.addActionListener(e -> mostrarHistorialTutorias());
+        btnMostrarRecursos.addActionListener(e -> mostrarPanelMostrarRecursos()); // Nuevo
         btnAgregarRecurso.addActionListener(e -> mostrarPanelAgregarRecurso());
         btnEliminarEstudiante.addActionListener(e -> mostrarPanelEliminarEstudiante());
         btnEliminarProfesor.addActionListener(e -> mostrarPanelEliminarProfesor());
@@ -274,6 +277,17 @@ public class MainFrame extends JFrame {
         panelCentral.repaint();
     }
 
+    // --- NUEVO MÉTODO ---
+    private void mostrarPanelMostrarRecursos() {
+        panelCentral.removeAll();
+        JTextArea area = new JTextArea(sistema.listarRecursosAcademicos());
+        area.setEditable(false);
+        panelCentral.setLayout(new BorderLayout());
+        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
     private void mostrarPanelAgregarRecurso() {
         panelCentral.removeAll();
         panelCentral.setLayout(new GridBagLayout());
@@ -377,4 +391,3 @@ public class MainFrame extends JFrame {
         SwingUtilities.invokeLater(() -> new MainFrame(sistema).setVisible(true));
     }
 }
-
