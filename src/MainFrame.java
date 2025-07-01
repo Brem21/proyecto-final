@@ -49,12 +49,16 @@ public class MainFrame extends JFrame {
 
     private JPanel crearMenuBotones() {
         Color azul = new Color(0, 123, 255);
-        JPanel menu = new JPanel(new GridLayout(9, 1, 8, 8));
+        JPanel menu = new JPanel(new GridLayout(10, 1, 8, 8));
         menu.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         menu.setBackground(new Color(200, 220, 255));
 
-        String[] labels = { "Estudiante", "Profesor", "Asignar", "Ver", "Otros", "Buscar Estudiante",
-                "Buscar Profesor", "Recursos", "Ver Recursos" };
+        String[] labels = {
+                "Estudiante", "Profesor", "Asignar", "Ver", "Otros",
+                "Buscar Estudiante", "Buscar Profesor", "Recursos",
+                "Ver Recursos", "Gestionar Recursos"
+        };
+
         JButton[] botones = new JButton[labels.length];
 
         for (int i = 0; i < labels.length; i++) {
@@ -76,6 +80,7 @@ public class MainFrame extends JFrame {
         botones[6].addActionListener(e -> buscarUltimaTutoriaProfesor());
         botones[7].addActionListener(e -> panelAgregarRecurso());
         botones[8].addActionListener(e -> panelVerRecursos());
+        botones[9].addActionListener(e -> panelGestionarRecursos()); // Agregado
 
         return menu;
     }
@@ -579,6 +584,76 @@ public class MainFrame extends JFrame {
         panelCentral.revalidate();
         panelCentral.repaint();
     }
+
+    private void panelGestionarRecursos() {
+        panelCentral.removeAll();
+
+        String[] columnas = { "Nombre", "Link", "Materia" };
+        DefaultTableModel model = new DefaultTableModel(columnas, 0);
+        JTable tabla = new JTable(model);
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        recursosAcademicos.forEach(r -> model.addRow(new Object[] {
+                r.getNombre(), r.getLink(), r.getMateria()
+        }));
+
+        JButton actualizar = new JButton("Actualizar");
+        JButton eliminar = new JButton("Eliminar");
+        JLabel resultado = new JLabel();
+
+        actualizar.setBackground(new Color(0, 123, 255));
+        actualizar.setForeground(Color.WHITE);
+        eliminar.setBackground(new Color(200, 0, 0));
+        eliminar.setForeground(Color.WHITE);
+
+        actualizar.addActionListener(e -> {
+            int fila = tabla.getSelectedRow();
+            if (fila != -1) {
+                String nuevoNombre = JOptionPane.showInputDialog(this, "Nuevo nombre:", model.getValueAt(fila, 0));
+                String nuevoLink = JOptionPane.showInputDialog(this, "Nuevo link:", model.getValueAt(fila, 1));
+                String nuevaMateria = JOptionPane.showInputDialog(this, "Nueva materia:", model.getValueAt(fila, 2));
+
+                if (nuevoNombre != null && nuevoLink != null && nuevaMateria != null) {
+                    model.setValueAt(nuevoNombre, fila, 0);
+                    model.setValueAt(nuevoLink, fila, 1);
+                    model.setValueAt(nuevaMateria, fila, 2);
+
+                    RecursoAcademico recurso = recursosAcademicos.get(fila);
+                    recurso.setNombre(nuevoNombre);
+                    recurso.setLink(nuevoLink);
+                    recurso.setMateria(nuevaMateria);
+
+                    resultado.setText("✅ Recurso actualizado");
+                }
+            } else {
+                resultado.setText("❌ Selecciona un recurso");
+            }
+        });
+
+        eliminar.addActionListener(e -> {
+            int fila = tabla.getSelectedRow();
+            if (fila != -1) {
+                recursosAcademicos.remove(fila);
+                model.removeRow(fila);
+                resultado.setText("✅ Recurso eliminado");
+            } else {
+                resultado.setText("❌ Selecciona un recurso");
+            }
+        });
+
+        JPanel botones = new JPanel(new FlowLayout());
+        botones.add(actualizar);
+        botones.add(eliminar);
+        botones.add(resultado);
+
+        panelCentral.add(new JScrollPane(tabla), BorderLayout.CENTER);
+        panelCentral.add(botones, BorderLayout.SOUTH);
+        panelCentral.add(crearBotonVolver(), BorderLayout.NORTH);
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
 
     private String generarCedulaAleatoria(int digitos) {
         Random rand = new Random();

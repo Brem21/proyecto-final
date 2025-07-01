@@ -12,4 +12,8 @@ public class RecursoAcademico {
     public String getNombre() { return nombre; }
     public String getLink() { return link; }
     public String getMateria() { return materia; }
+
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setLink(String link) { this.link = link; }
+    public void setMateria(String materia) { this.materia = materia; }
 }

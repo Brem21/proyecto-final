@@ -1,0 +1,97 @@
+@startuml
+
+class Estudiante {
+    - String nombre
+    - String cedula
+    - String region
+    - int edad
+    - String anio
+    - String materia
+    - String horas
+    - String codigo
+    + Estudiante(nombre:int, edad:int, materia:String, horas:String, region:String, cedula:String, anio:String)
+    + getNombre(): String
+    + getEdad(): int
+    + getMateria(): String
+    + getHoras(): String
+    + getCodigo(): String
+    + getRegion(): String
+    + getCedula(): String
+    + getAnio(): String
+}
+
+class Profesor {
+    - String nombre
+    - String experiencia
+    - String materia
+    - String horas
+    - String codigo
+    - String cedula
+    - String region
+    + Profesor(nombre:String, experiencia:String, materia:String, horas:String, cedula:String, region:String)
+    + getNombre(): String
+    + getExperiencia(): String
+    + getMateria(): String
+    + getHoras(): String
+    + getCodigo(): String
+    + getRegion(): String
+    + getCedula(): String
+}
+
+class Tutoria {
+    - Estudiante estudiante
+    - Profesor profesor
+    - String materia
+    + Tutoria(estudiante:Estudiante, profesor:Profesor, materia:String)
+    + getEstudiante(): Estudiante
+    + getProfesor(): Profesor
+    + getMateria(): String
+}
+
+class RecursoAcademico {
+    - String nombre
+    - String link
+    - String materia
+    + RecursoAcademico(nombre:String, link:String, materia:String)
+    + getNombre(): String
+    + getLink(): String
+    + getMateria(): String
+}
+
+class GestionApoyos {
+    - Queue<Estudiante> colaSolicitudes
+    - List<Profesor> profesoresDisponibles
+    - List<Tutoria> historialTutorias
+    + agregarSolicitud(e:Estudiante): void
+    + getColaSolicitudes(): Queue<Estudiante>
+    + agregarProfesor(p:Profesor): void
+    + getProfesoresDisponibles(): List<Profesor>
+    + asignarTutor(e:Estudiante, p:Profesor): void
+    + getHistorialTutorias(): List<Tutoria>
+    + eliminarEstudiantePorCodigo(codigo:String): boolean
+    + eliminarProfesorPorCodigo(codigo:String): boolean
+    + getUltimaTutoriaEstudiante(codigo:String): Optional<Tutoria>
+    + getUltimaTutoriaProfesor(codigo:String): Optional<Tutoria>
+}
+
+class MainFrame {
+    - GestionApoyos sistema
+    - JPanel panelCentral
+    - List<RecursoAcademico> recursosAcademicos
+    + MainFrame()
+    + main(args:String[]): void
+}
+
+GestionApoyos "1" o-- "*" Estudiante : gestiona >
+GestionApoyos "1" o-- "*" Profesor : gestiona >
+GestionApoyos "1" o-- "*" Tutoria : historial >
+Tutoria "1" *-- "1" Estudiante : estudiante
+Tutoria "1" *-- "1" Profesor : profesor
+
+MainFrame "1" *-- "1" GestionApoyos : usa
+MainFrame "1" ..> Estudiante : registra/usa >
+MainFrame "1" ..> Profesor : registra/usa >
+MainFrame "1" ..> Tutoria : visualiza/usa >
+MainFrame "1" ..> RecursoAcademico : agrega/usa >
+
+@enduml
