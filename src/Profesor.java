@@ -1,29 +1,31 @@
 public class Profesor {
-    private static int contador = 1;
     private String nombre;
     private String experiencia;
     private String materia;
     private String horas;
-    private String region;
     private String codigo;
-    private boolean ocupado = false;
+    private String cedula;
+    private String region;
 
-    public Profesor(String nombre, String experiencia, String materia, String horas, String region) {
+    public Profesor(String nombre, String experiencia, String materia, String horas, String cedula, String region) {
         this.nombre = nombre;
         this.experiencia = experiencia;
         this.materia = materia;
         this.horas = horas;
+        this.cedula = cedula;
         this.region = region;
-        this.codigo = String.format("PROF-%03d", contador++);
+        this.codigo = generarCodigo();
     }
 
+    private String generarCodigo() {
+        return "PRO" + ((int)(Math.random()*9000)+1000);
+    }
+
+    public String getNombre() { return nombre; }
+    public String getExperiencia() { return experiencia; }
+    public String getMateria() { return materia; }
+    public String getHoras() { return horas; }
     public String getCodigo() { return codigo; }
     public String getRegion() { return region; }
-    public boolean isOcupado() { return ocupado; }
-    public void setOcupado(boolean ocupado) { this.ocupado = ocupado; }
-
-    @Override
-    public String toString() {
-        return codigo + " - " + nombre + " (" + materia + ", región: " + region + ")" + (ocupado ? " [Ocupado]" : "");
-    }
+    public String getCedula() { return cedula; }
 }

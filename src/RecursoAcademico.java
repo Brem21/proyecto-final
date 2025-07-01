@@ -1,16 +1,15 @@
 public class RecursoAcademico {
-    private String titulo;
-    private String descripcion;
-    private String enlace;
+    private String nombre;
+    private String link;
+    private String materia;
 
-    public RecursoAcademico(String titulo, String descripcion, String enlace) {
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.enlace = enlace;
+    public RecursoAcademico(String nombre, String link, String materia) {
+        this.nombre = nombre;
+        this.link = link;
+        this.materia = materia;
     }
 
-    @Override
-    public String toString() {
-        return "Título: " + titulo + ", Descripción: " + descripcion + ", Enlace: " + enlace;
-    }
+    public String getNombre() { return nombre; }
+    public String getLink() { return link; }
+    public String getMateria() { return materia; }
 }

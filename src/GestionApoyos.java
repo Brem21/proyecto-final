@@ -1,107 +1,57 @@
 import java.util.*;
 
 public class GestionApoyos {
-    private Queue<Estudiante> colaSolicitudes;
-    private ArrayList<Profesor> profesoresDisponibles;
-    private ArrayList<Tutoria> historialTutorias;
-    private ArrayList<RecursoAcademico> recursosAcademicos;
+    private Queue<Estudiante> colaSolicitudes = new LinkedList<>();
+    private List<Profesor> profesoresDisponibles = new ArrayList<>();
+    private List<Tutoria> historialTutorias = new ArrayList<>();
 
-    public GestionApoyos() {
-        colaSolicitudes = new LinkedList<>();
-        profesoresDisponibles = new ArrayList<>();
-        historialTutorias = new ArrayList<>();
-        recursosAcademicos = new ArrayList<>();
+    public void agregarSolicitud(Estudiante e) {
+        colaSolicitudes.add(e);
     }
 
-    public void agregarEstudiante(Estudiante e) {
-        colaSolicitudes.offer(e);
+    public Queue<Estudiante> getColaSolicitudes() {
+        return colaSolicitudes;
     }
 
     public void agregarProfesor(Profesor p) {
         profesoresDisponibles.add(p);
     }
 
-    public void agregarRecursoAcademico(RecursoAcademico r) {
-        recursosAcademicos.add(r);
+    public List<Profesor> getProfesoresDisponibles() {
+        return profesoresDisponibles;
     }
 
-    public String listarSolicitudes() {
-        if (colaSolicitudes.isEmpty()) return "No hay solicitudes pendientes.";
-        StringBuilder sb = new StringBuilder();
-        for (Estudiante e : colaSolicitudes) {
-            sb.append(e.toString()).append("\n");
-        }
-        return sb.toString();
+    // Ahora pasa materia al crear la tutoría
+    public void asignarTutor(Estudiante e, Profesor p) {
+        historialTutorias.add(new Tutoria(e, p, e.getMateria()));
+        colaSolicitudes.remove(e);
     }
 
-    public String listarProfesoresRegistrados() {
-        if (profesoresDisponibles.isEmpty()) return "No hay profesores registrados.";
-        StringBuilder sb = new StringBuilder();
-        for (Profesor p : profesoresDisponibles) {
-            sb.append(p.toString()).append("\n");
-        }
-        return sb.toString();
-    }
-
-    public String listarHistorialTutorias() {
-        if (historialTutorias.isEmpty()) return "No hay tutorías en el historial.";
-        StringBuilder sb = new StringBuilder();
-        for (Tutoria t : historialTutorias) {
-            sb.append(t.toString()).append("\n");
-        }
-        return sb.toString();
-    }
-
-    public String listarRecursosAcademicos() {
-        if (recursosAcademicos.isEmpty()) return "No hay recursos académicos.";
-        StringBuilder sb = new StringBuilder();
-        for (RecursoAcademico r : recursosAcademicos) {
-            sb.append(r.toString()).append("\n");
-        }
-        return sb.toString();
+    public List<Tutoria> getHistorialTutorias() {
+        return historialTutorias;
     }
 
     public boolean eliminarEstudiantePorCodigo(String codigo) {
-        return colaSolicitudes.removeIf(e -> e.getCodigo().equals(codigo));
+        return colaSolicitudes.removeIf(e -> e.getCodigo().equalsIgnoreCase(codigo));
     }
 
     public boolean eliminarProfesorPorCodigo(String codigo) {
-        return profesoresDisponibles.removeIf(p -> p.getCodigo().equals(codigo));
+        return profesoresDisponibles.removeIf(p -> p.getCodigo().equalsIgnoreCase(codigo));
     }
 
-    public String crearTutoria(String codEst, String codProf) {
-        Estudiante estudiante = null;
-        for (Estudiante e : colaSolicitudes) {
-            if (e.getCodigo().equals(codEst)) {
-                estudiante = e;
-                break;
-            }
+    public Optional<Tutoria> getUltimaTutoriaEstudiante(String codigo) {
+        for (int i = historialTutorias.size() - 1; i >= 0; i--) {
+            if (historialTutorias.get(i).getEstudiante().getCodigo().equalsIgnoreCase(codigo))
+                return Optional.of(historialTutorias.get(i));
         }
+        return Optional.empty();
+    }
 
-        if (estudiante == null) return "Estudiante no encontrado en solicitudes.";
-
-        Profesor profesor = null;
-        for (Profesor p : profesoresDisponibles) {
-            if (p.getCodigo().equals(codProf)) {
-                profesor = p;
-                break;
-            }
+    public Optional<Tutoria> getUltimaTutoriaProfesor(String codigo) {
+        for (int i = historialTutorias.size() - 1; i >= 0; i--) {
+            if (historialTutorias.get(i).getProfesor().getCodigo().equalsIgnoreCase(codigo))
+                return Optional.of(historialTutorias.get(i));
         }
-
-        if (profesor == null) return "Profesor no encontrado.";
-
-        if (profesor.isOcupado()) {
-            return "El profesor ya tiene una tutoría asignada.";
-        }
-
-        if (!profesor.getRegion().equalsIgnoreCase(estudiante.getRegion())) {
-            return "El profesor no pertenece a la misma región que el estudiante.";
-        }
-
-        Tutoria t = new Tutoria(estudiante, profesor);
-        historialTutorias.add(t);
-        profesor.setOcupado(true);
-        colaSolicitudes.remove(estudiante);
-        return "Tutoría asignada exitosamente.";
+        return Optional.empty();
     }
 }

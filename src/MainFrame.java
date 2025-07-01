@@ -1,393 +1,595 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 public class MainFrame extends JFrame {
     private GestionApoyos sistema;
     private JPanel panelCentral;
+    private java.util.List<RecursoAcademico> recursosAcademicos = new ArrayList<>();
+    private static final Map<String, String> PREFIJOS_REGION;
+    static {
+        PREFIJOS_REGION = new HashMap<>();
+        PREFIJOS_REGION.put("Costa", "09");
+        PREFIJOS_REGION.put("Sierra", "01");
+        PREFIJOS_REGION.put("Amazonía", "14");
+        PREFIJOS_REGION.put("Galápagos", "20");
+    }
 
-    private JTextField txtNombre, txtExp, txtMateria;
-    private JComboBox<String> cbHoras;
-    private JComboBox<Region> cbRegion;
-
-    public MainFrame(GestionApoyos sistema) {
-        this.sistema = sistema;
-        setTitle("Gestión de Tutorías - Proyecto Final");
-        setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public MainFrame() {
+        sistema = new GestionApoyos();
+        setTitle("📚 Tutorías App");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(600, 770);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // --- Panel Menú ---
-        JPanel panelMenu = new JPanel(new GridLayout(11, 1, 10, 10)); // Ahora 11 filas
+        panelCentral = new JPanel(new BorderLayout());
+        panelCentral.setBackground(new Color(230, 240, 255));
 
-        JButton btnEstudiante = new JButton("Estudiante");
-        JButton btnAgregarProfesor = new JButton("Agregar Profesor");
-        JButton btnCrearTutoria = new JButton("Crear Tutoría");
-        JButton btnSolicitudes = new JButton("Solicitudes");
-        JButton btnProfesoresReg = new JButton("Profesores Registrados");
-        JButton btnHistorialTutorias = new JButton("Historial de Tutorías");
-        JButton btnMostrarRecursos = new JButton("Mostrar Recursos");
-        JButton btnAgregarRecurso = new JButton("Agregar Recurso Académico");
-        JButton btnEliminarEstudiante = new JButton("Eliminar Estudiante");
-        JButton btnEliminarProfesor = new JButton("Eliminar Profesor");
+        mostrarBienvenida();
 
-        panelMenu.add(btnEstudiante);
-        panelMenu.add(btnAgregarProfesor);
-        panelMenu.add(btnCrearTutoria);
-        panelMenu.add(btnSolicitudes);
-        panelMenu.add(btnProfesoresReg);
-        panelMenu.add(btnHistorialTutorias);
-        panelMenu.add(btnMostrarRecursos); // <-- Nuevo botón
-        panelMenu.add(btnAgregarRecurso);
-        panelMenu.add(btnEliminarEstudiante);
-        panelMenu.add(btnEliminarProfesor);
-
-        add(panelMenu, BorderLayout.WEST);
-
-        panelCentral = new JPanel();
-        panelCentral.add(new JLabel("Selecciona una opción del menú."));
         add(panelCentral, BorderLayout.CENTER);
+        add(crearMenuBotones(), BorderLayout.WEST);
 
-        // --- Listeners ---
-        btnEstudiante.addActionListener(e -> mostrarPanelAgregarEstudiante());
-        btnAgregarProfesor.addActionListener(e -> mostrarPanelAgregarProfesor());
-        btnCrearTutoria.addActionListener(e -> mostrarPanelCrearTutoria());
-        btnSolicitudes.addActionListener(e -> mostrarSolicitudes());
-        btnProfesoresReg.addActionListener(e -> mostrarProfesoresRegistrados());
-        btnHistorialTutorias.addActionListener(e -> mostrarHistorialTutorias());
-        btnMostrarRecursos.addActionListener(e -> mostrarPanelMostrarRecursos()); // Nuevo
-        btnAgregarRecurso.addActionListener(e -> mostrarPanelAgregarRecurso());
-        btnEliminarEstudiante.addActionListener(e -> mostrarPanelEliminarEstudiante());
-        btnEliminarProfesor.addActionListener(e -> mostrarPanelEliminarProfesor());
+        setVisible(true);
     }
 
-    private void mostrarPanelAgregarEstudiante() {
+    private void mostrarBienvenida() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
+        JLabel lbl = new JLabel(
+                "<html><center><h1 style='color:#004A99;'>Bienvenido a TutoriasAPP ✨</h1></center></html>",
+                SwingConstants.CENTER);
+        panelCentral.add(lbl, BorderLayout.CENTER);
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
 
-        JLabel lblNombre = new JLabel("Nombre:");
-        txtNombre = new JTextField(15);
+    private JPanel crearMenuBotones() {
+        Color azul = new Color(0, 123, 255);
+        JPanel menu = new JPanel(new GridLayout(9, 1, 8, 8));
+        menu.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        menu.setBackground(new Color(200, 220, 255));
 
-        JLabel lblEdad = new JLabel("Edad:");
-        txtExp = new JTextField(5);
+        String[] labels = { "Estudiante", "Profesor", "Asignar", "Ver", "Otros", "Buscar Estudiante",
+                "Buscar Profesor", "Recursos", "Ver Recursos" };
+        JButton[] botones = new JButton[labels.length];
 
-        JLabel lblMateria = new JLabel("Materia:");
-        txtMateria = new JTextField(10);
+        for (int i = 0; i < labels.length; i++) {
+            botones[i] = new JButton(labels[i]);
+            botones[i].setBackground(azul);
+            botones[i].setForeground(Color.WHITE);
+            botones[i].setFont(new Font("Segoe UI", Font.BOLD, 13));
+            botones[i].setFocusable(false);
+            botones[i].setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            menu.add(botones[i]);
+        }
 
-        JLabel lblHoras = new JLabel("Horas:");
-        cbHoras = new JComboBox<>(new String[] {"1 hora", "2 horas", "3 horas"});
+        botones[0].addActionListener(e -> panelEstudiante());
+        botones[1].addActionListener(e -> panelProfesor());
+        botones[2].addActionListener(e -> panelAsignarTutoria());
+        botones[3].addActionListener(e -> panelVerOpciones());
+        botones[4].addActionListener(e -> panelOtros());
+        botones[5].addActionListener(e -> buscarUltimaTutoriaEstudiante());
+        botones[6].addActionListener(e -> buscarUltimaTutoriaProfesor());
+        botones[7].addActionListener(e -> panelAgregarRecurso());
+        botones[8].addActionListener(e -> panelVerRecursos());
 
-        JLabel lblRegion = new JLabel("Región:");
-        cbRegion = new JComboBox<>(Region.REGIONES);
+        return menu;
+    }
 
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnCancelar = new JButton("Cancelar");
+    private JButton crearBotonVolver() {
+        JButton btn = new JButton("🔙 Volver");
+        btn.setBackground(new Color(180, 180, 180));
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btn.setFocusable(false);
+        btn.addActionListener(e -> mostrarBienvenida());
+        return btn;
+    }
 
-        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblNombre, gbc);
-        gbc.gridx = 1; panelCentral.add(txtNombre, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblEdad, gbc);
-        gbc.gridx = 1; panelCentral.add(txtExp, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblMateria, gbc);
-        gbc.gridx = 1; panelCentral.add(txtMateria, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblHoras, gbc);
-        gbc.gridx = 1; panelCentral.add(cbHoras, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblRegion, gbc);
-        gbc.gridx = 1; panelCentral.add(cbRegion, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnGuardar, gbc);
-        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
+    private void panelEstudiante() {
+        panelCentral.removeAll();
+        panelCentral.setLayout(new BorderLayout());
 
-        btnGuardar.addActionListener(a -> {
+        JPanel form = new JPanel(new GridLayout(9, 2, 6, 6));
+        form.setBackground(Color.WHITE);
+        form.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(0, 123, 255)),
+                "Registro de Estudiante", 0, 0, new Font("Segoe UI", Font.BOLD, 14), Color.BLUE));
+
+        JTextField n = new JTextField(), e = new JTextField(), m = new JTextField(), anio = new JTextField(), edadCampo = new JTextField();
+        JComboBox<String> regionBox = new JComboBox<>(new String[] { "Costa", "Sierra", "Amazonía", "Galápagos" });
+        JComboBox<String> h = new JComboBox<>(new String[] { "1 hora", "2 horas", "3 horas" });
+        JLabel res = new JLabel();
+
+        regionBox.addActionListener(a -> {
+            String region = (String) regionBox.getSelectedItem();
+            String prefijo = PREFIJOS_REGION.get(region);
+            e.setText(prefijo + generarCedulaAleatoria(8));
+        });
+
+        JButton g = new JButton("Guardar");
+        g.setBackground(new Color(0, 150, 100));
+        g.setForeground(Color.WHITE);
+        g.addActionListener(a -> {
             try {
-                String nombre = txtNombre.getText().trim();
-                int edad = Integer.parseInt(txtExp.getText().trim());
-                String materia = txtMateria.getText().trim();
-                String horas = (String) cbHoras.getSelectedItem();
-                String region = ((Region) cbRegion.getSelectedItem()).getNombre();
-
-                Estudiante est = new Estudiante(nombre, edad, materia, horas, region);
-                sistema.agregarEstudiante(est);
-
-                JOptionPane.showMessageDialog(this, "Estudiante agregado correctamente.");
-                panelCentral.removeAll();
-                panelCentral.add(new JLabel("Estudiante registrado."));
-                panelCentral.revalidate();
-                panelCentral.repaint();
+                int edad = Integer.parseInt(edadCampo.getText());
+                Estudiante est = new Estudiante(n.getText(), edad, m.getText(),
+                        (String) h.getSelectedItem(), (String) regionBox.getSelectedItem(), e.getText(), anio.getText());
+                sistema.agregarSolicitud(est);
+                res.setText("✅ Agregado con código: " + est.getCodigo());
+                n.setText("");
+                e.setText("");
+                m.setText("");
+                h.setSelectedIndex(0);
+                anio.setText("");
+                edadCampo.setText("");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Datos inválidos: " + ex.getMessage());
+                res.setText("❌ Error en los datos");
             }
         });
 
-        btnCancelar.addActionListener(a -> {
-            panelCentral.removeAll();
-            panelCentral.add(new JLabel("Operación cancelada."));
-            panelCentral.revalidate();
-            panelCentral.repaint();
-        });
+        form.add(new JLabel("Nombre:"));
+        form.add(n);
+        form.add(new JLabel("Cédula:"));
+        form.add(e);
+        form.add(new JLabel("Región:"));
+        form.add(regionBox);
+        form.add(new JLabel("Año:"));
+        form.add(anio);
+        form.add(new JLabel("Edad:"));
+        form.add(edadCampo);
+        form.add(new JLabel("Materia:"));
+        form.add(m);
+        form.add(new JLabel("Horas:"));
+        form.add(h);
+        form.add(g);
+        form.add(res);
+
+        panelCentral.add(form, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
 
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    private void mostrarPanelAgregarProfesor() {
+    private void panelProfesor() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
+        panelCentral.setLayout(new BorderLayout());
 
-        JLabel lblNombre = new JLabel("Nombre:");
-        txtNombre = new JTextField(15);
+        JPanel form = new JPanel(new GridLayout(7, 2, 6, 6));
+        form.setBackground(Color.WHITE);
+        form.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(100, 0, 130)),
+                "Registro de Profesor", 0, 0, new Font("Segoe UI", Font.BOLD, 14), new Color(100, 0, 130)));
 
-        JLabel lblExp = new JLabel("Experiencia:");
-        txtExp = new JTextField(10);
+        JTextField n = new JTextField(), ex = new JTextField(), ma = new JTextField(), ced = new JTextField();
+        JComboBox<String> regionBox = new JComboBox<>(new String[] { "Costa", "Sierra", "Amazonía", "Galápagos" });
+        JComboBox<String> h = new JComboBox<>(new String[] { "1 hora", "2 horas", "3 horas" });
+        JLabel res = new JLabel();
 
-        JLabel lblMateria = new JLabel("Materia:");
-        txtMateria = new JTextField(10);
+        regionBox.addActionListener(a -> {
+            String region = (String) regionBox.getSelectedItem();
+            String prefijo = PREFIJOS_REGION.get(region);
+            ced.setText(prefijo + generarCedulaAleatoria(8));
+        });
 
-        JLabel lblHoras = new JLabel("Horas:");
-        cbHoras = new JComboBox<>(new String[] {"1 hora", "2 horas", "3 horas"});
+        JButton g = new JButton("Guardar");
+        g.setBackground(new Color(75, 0, 130));
+        g.setForeground(Color.WHITE);
+        g.addActionListener(a -> {
+            Profesor p = new Profesor(n.getText(), ex.getText(), ma.getText(), (String) h.getSelectedItem(),
+                    ced.getText(), (String) regionBox.getSelectedItem());
+            sistema.agregarProfesor(p);
+            res.setText("✅ Agregado con código: " + p.getCodigo());
+            n.setText("");
+            ex.setText("");
+            ma.setText("");
+            ced.setText("");
+            h.setSelectedIndex(0);
+        });
 
-        JLabel lblRegion = new JLabel("Región:");
-        cbRegion = new JComboBox<>(Region.REGIONES);
+        form.add(new JLabel("Nombre:"));
+        form.add(n);
+        form.add(new JLabel("Cédula:"));
+        form.add(ced);
+        form.add(new JLabel("Región:"));
+        form.add(regionBox);
+        form.add(new JLabel("Experiencia:"));
+        form.add(ex);
+        form.add(new JLabel("Materia:"));
+        form.add(ma);
+        form.add(new JLabel("Horas:"));
+        form.add(h);
+        form.add(g);
+        form.add(res);
 
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnCancelar = new JButton("Cancelar");
+        panelCentral.add(form, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
 
-        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblNombre, gbc);
-        gbc.gridx = 1; panelCentral.add(txtNombre, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblExp, gbc);
-        gbc.gridx = 1; panelCentral.add(txtExp, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblMateria, gbc);
-        gbc.gridx = 1; panelCentral.add(txtMateria, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblHoras, gbc);
-        gbc.gridx = 1; panelCentral.add(cbHoras, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblRegion, gbc);
-        gbc.gridx = 1; panelCentral.add(cbRegion, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnGuardar, gbc);
-        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
 
-        btnGuardar.addActionListener(a -> {
-            try {
-                String nombre = txtNombre.getText().trim();
-                String experiencia = txtExp.getText().trim();
-                String materia = txtMateria.getText().trim();
-                String horas = (String) cbHoras.getSelectedItem();
-                String region = ((Region) cbRegion.getSelectedItem()).getNombre();
+    private void panelAsignarTutoria() {
+        panelCentral.removeAll();
+        panelCentral.setLayout(new BorderLayout());
 
-                Profesor prof = new Profesor(nombre, experiencia, materia, horas, region);
-                sistema.agregarProfesor(prof);
+        JPanel form = new JPanel(new GridLayout(4, 2, 6, 6));
+        form.setBackground(Color.WHITE);
+        form.setBorder(BorderFactory.createTitledBorder("Asignar Tutoría"));
 
-                JOptionPane.showMessageDialog(this, "Profesor agregado correctamente.");
-                panelCentral.removeAll();
-                panelCentral.add(new JLabel("Profesor registrado."));
-                panelCentral.revalidate();
-                panelCentral.repaint();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Datos inválidos: " + ex.getMessage());
+        JComboBox<Estudiante> ce = new JComboBox<>();
+        sistema.getColaSolicitudes().forEach(ce::addItem);
+
+        JComboBox<Profesor> cp = new JComboBox<>();
+        sistema.getProfesoresDisponibles().forEach(cp::addItem);
+
+        JLabel res = new JLabel();
+
+        JButton g = new JButton("Asignar");
+        g.setBackground(new Color(255, 140, 0));
+        g.setForeground(Color.WHITE);
+        g.addActionListener(a -> {
+            Estudiante est = (Estudiante) ce.getSelectedItem();
+            Profesor prof = (Profesor) cp.getSelectedItem();
+            if (est != null && prof != null) {
+                if (est.getMateria().equalsIgnoreCase(prof.getMateria())) {
+                    sistema.asignarTutor(est, prof);
+                    res.setText("✅ Asignado " + est.getNombre() + " con " + prof.getNombre());
+                } else {
+                    res.setText("Error: materias no coinciden");
+                }
+            } else {
+                res.setText("Selecciona ambos campos");
             }
         });
 
-        btnCancelar.addActionListener(a -> {
-            panelCentral.removeAll();
-            panelCentral.add(new JLabel("Operación cancelada."));
-            panelCentral.revalidate();
-            panelCentral.repaint();
-        });
+        form.add(new JLabel("Estudiante:"));
+        form.add(ce);
+        form.add(new JLabel("Profesor:"));
+        form.add(cp);
+        form.add(g);
+        form.add(res);
+
+        panelCentral.add(form, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
 
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    private void mostrarPanelCrearTutoria() {
+    // PANEL DE SOLICITUDES (mejorado: sí se muestran las solicitudes actuales)
+    private void panelSolicitudes() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
 
-        JLabel lblEstudiante = new JLabel("Código Estudiante:");
-        JTextField txtCodEst = new JTextField(10);
+        String[] columnas = { "Código", "Nombre", "Cédula", "Región", "Edad", "Año", "Materia", "Horas" };
+        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
-        JLabel lblProfesor = new JLabel("Código Profesor:");
-        JTextField txtCodProf = new JTextField(10);
+        sistema.getColaSolicitudes().forEach(e -> model.addRow(
+                new Object[] { e.getCodigo(), e.getNombre(), e.getCedula(), e.getRegion(), e.getEdad(), e.getAnio(), e.getMateria(), e.getHoras() }));
 
-        JButton btnAsignar = new JButton("Asignar Tutoría");
-        JButton btnCancelar = new JButton("Cancelar");
+        JTable tabla = new JTable(model);
 
-        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblEstudiante, gbc);
-        gbc.gridx = 1; panelCentral.add(txtCodEst, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblProfesor, gbc);
-        gbc.gridx = 1; panelCentral.add(txtCodProf, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnAsignar, gbc);
-        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
+        panelCentral.add(new JScrollPane(tabla), BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
 
-        btnAsignar.addActionListener(e -> {
-            String codEst = txtCodEst.getText().trim();
-            String codProf = txtCodProf.getText().trim();
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
 
-            String resultado = sistema.crearTutoria(codEst, codProf);
-            JOptionPane.showMessageDialog(this, resultado);
+    private void panelVerOpciones() {
+        String[] opciones = { "Solicitudes", "Profesores", "Estudiantes", "Historial" };
+        String seleccion = (String) JOptionPane.showInputDialog(this, "Elige una sección:", "Visualizar",
+                JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
 
-            if (resultado.equals("Tutoría asignada exitosamente.")) {
-                txtCodEst.setText("");
-                txtCodProf.setText("");
+        if (seleccion != null) {
+            switch (seleccion) {
+                case "Solicitudes":
+                    panelSolicitudes();
+                    break;
+                case "Profesores":
+                    panelProfesores();
+                    break;
+                case "Estudiantes":
+                    panelEstudiantesRegistrados();
+                    break;
+                case "Historial":
+                    panelHistorial();
+                    break;
+            }
+        }
+    }
+
+    private void panelProfesores() {
+        panelCentral.removeAll();
+
+        String[] columnas = { "Código", "Nombre", "Cédula", "Región", "Experiencia", "Materia", "Horas" };
+        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        sistema.getProfesoresDisponibles().forEach(p -> model.addRow(
+                new Object[] { p.getCodigo(), p.getNombre(), p.getCedula(), p.getRegion(), p.getExperiencia(), p.getMateria(), p.getHoras() }));
+
+        JTable tabla = new JTable(model);
+
+        panelCentral.add(new JScrollPane(tabla), BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
+    private void panelEstudiantesRegistrados() {
+        panelCentral.removeAll();
+
+        String[] columnas = { "Código", "Nombre", "Cédula", "Región", "Edad", "Año", "Materia", "Horas" };
+        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Set<String> codigos = new HashSet<>();
+
+        sistema.getColaSolicitudes().forEach(e -> {
+            if (codigos.add(e.getCodigo())) {
+                model.addRow(new Object[] { e.getCodigo(), e.getNombre(), e.getCedula(), e.getRegion(), e.getEdad(), e.getAnio(), e.getMateria(), e.getHoras() });
             }
         });
 
-        btnCancelar.addActionListener(a -> {
-            panelCentral.removeAll();
-            panelCentral.add(new JLabel("Operación cancelada."));
-            panelCentral.revalidate();
-            panelCentral.repaint();
-        });
-
-        panelCentral.revalidate();
-        panelCentral.repaint();
-    }
-
-    private void mostrarSolicitudes() {
-        panelCentral.removeAll();
-        JTextArea area = new JTextArea(sistema.listarSolicitudes());
-        area.setEditable(false);
-        panelCentral.setLayout(new BorderLayout());
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
-        panelCentral.revalidate();
-        panelCentral.repaint();
-    }
-
-    private void mostrarProfesoresRegistrados() {
-        panelCentral.removeAll();
-        JTextArea area = new JTextArea(sistema.listarProfesoresRegistrados());
-        area.setEditable(false);
-        panelCentral.setLayout(new BorderLayout());
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
-        panelCentral.revalidate();
-        panelCentral.repaint();
-    }
-
-    private void mostrarHistorialTutorias() {
-        panelCentral.removeAll();
-        JTextArea area = new JTextArea(sistema.listarHistorialTutorias());
-        area.setEditable(false);
-        panelCentral.setLayout(new BorderLayout());
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
-        panelCentral.revalidate();
-        panelCentral.repaint();
-    }
-
-    // --- NUEVO MÉTODO ---
-    private void mostrarPanelMostrarRecursos() {
-        panelCentral.removeAll();
-        JTextArea area = new JTextArea(sistema.listarRecursosAcademicos());
-        area.setEditable(false);
-        panelCentral.setLayout(new BorderLayout());
-        panelCentral.add(new JScrollPane(area), BorderLayout.CENTER);
-        panelCentral.revalidate();
-        panelCentral.repaint();
-    }
-
-    private void mostrarPanelAgregarRecurso() {
-        panelCentral.removeAll();
-        panelCentral.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        JLabel lblTitulo = new JLabel("Título:");
-        JTextField txtTitulo = new JTextField(15);
-
-        JLabel lblDescripcion = new JLabel("Descripción:");
-        JTextField txtDescripcion = new JTextField(20);
-
-        JLabel lblEnlace = new JLabel("Enlace:");
-        JTextField txtEnlace = new JTextField(20);
-
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnCancelar = new JButton("Cancelar");
-
-        gbc.gridx = 0; gbc.gridy = 0; panelCentral.add(lblTitulo, gbc);
-        gbc.gridx = 1; panelCentral.add(txtTitulo, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblDescripcion, gbc);
-        gbc.gridx = 1; panelCentral.add(txtDescripcion, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(lblEnlace, gbc);
-        gbc.gridx = 1; panelCentral.add(txtEnlace, gbc);
-        gbc.gridx = 0; gbc.gridy++; panelCentral.add(btnGuardar, gbc);
-        gbc.gridx = 1; panelCentral.add(btnCancelar, gbc);
-
-        btnGuardar.addActionListener(a -> {
-            try {
-                String titulo = txtTitulo.getText().trim();
-                String descripcion = txtDescripcion.getText().trim();
-                String enlace = txtEnlace.getText().trim();
-
-                RecursoAcademico recurso = new RecursoAcademico(titulo, descripcion, enlace);
-                sistema.agregarRecursoAcademico(recurso);
-
-                JOptionPane.showMessageDialog(this, "Recurso agregado correctamente.");
-                panelCentral.removeAll();
-                panelCentral.add(new JLabel("Recurso agregado."));
-                panelCentral.revalidate();
-                panelCentral.repaint();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Datos inválidos: " + ex.getMessage());
+        sistema.getHistorialTutorias().forEach(t -> {
+            var e = t.getEstudiante();
+            if (codigos.add(e.getCodigo())) {
+                model.addRow(new Object[] { e.getCodigo(), e.getNombre(), e.getCedula(), e.getRegion(), e.getEdad(), e.getAnio(), e.getMateria(), e.getHoras() });
             }
         });
 
-        btnCancelar.addActionListener(a -> {
-            panelCentral.removeAll();
-            panelCentral.add(new JLabel("Operación cancelada."));
-            panelCentral.revalidate();
-            panelCentral.repaint();
-        });
+        JTable tabla = new JTable(model);
+
+        panelCentral.add(new JScrollPane(tabla), BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
 
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    private void mostrarPanelEliminarEstudiante() {
+    private void panelHistorial() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new FlowLayout());
-        JTextField txtCodigo = new JTextField(10);
-        JButton btnEliminar = new JButton("Eliminar");
-        panelCentral.add(new JLabel("Código de estudiante:"));
-        panelCentral.add(txtCodigo);
-        panelCentral.add(btnEliminar);
 
-        btnEliminar.addActionListener(e -> {
-            String codigo = txtCodigo.getText().trim();
-            boolean ok = sistema.eliminarEstudiantePorCodigo(codigo);
-            String msg = ok ? "Estudiante eliminado." : "Estudiante no encontrado.";
-            JOptionPane.showMessageDialog(this, msg);
-        });
+        DefaultListModel<String> modelo = new DefaultListModel<>();
+        List<Tutoria> historial = sistema.getHistorialTutorias();
+
+        if (historial.isEmpty()) {
+            modelo.addElement("No hay tutorías registradas.");
+        } else {
+            for (Tutoria t : historial) {
+                var e = t.getEstudiante();
+                var p = t.getProfesor();
+                modelo.addElement(String.format("Estudiante: %s (Cód: %s), Profesor: %s (Cód: %s), Materia: %s, Horas: %s",
+                        e.getNombre(), e.getCodigo(), p.getNombre(), p.getCodigo(), e.getMateria(), e.getHoras()));
+            }
+        }
+
+        JList<String> lista = new JList<>(modelo);
+        lista.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JScrollPane scroll = new JScrollPane(lista);
+
+        panelCentral.add(new JLabel("Historial de Tutorías", SwingConstants.CENTER), BorderLayout.NORTH);
+        panelCentral.add(scroll, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
 
         panelCentral.revalidate();
         panelCentral.repaint();
     }
 
-    private void mostrarPanelEliminarProfesor() {
-        panelCentral.removeAll();
-        panelCentral.setLayout(new FlowLayout());
-        JTextField txtCodigo = new JTextField(10);
-        JButton btnEliminar = new JButton("Eliminar");
-        panelCentral.add(new JLabel("Código de profesor:"));
-        panelCentral.add(txtCodigo);
-        panelCentral.add(btnEliminar);
+    private void panelOtros() {
+        String[] opciones = { "Eliminar Estudiante", "Eliminar Profesor" };
+        String seleccion = (String) JOptionPane.showInputDialog(this, "¿Qué deseas hacer?", "Otras acciones",
+                JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+        if (seleccion != null) {
+            if (seleccion.equals(opciones[0]))
+                panelEliminarEstudiante();
+            else
+                panelEliminarProfesor();
+        }
+    }
 
-        btnEliminar.addActionListener(e -> {
-            String codigo = txtCodigo.getText().trim();
-            boolean ok = sistema.eliminarProfesorPorCodigo(codigo);
-            String msg = ok ? "Profesor eliminado." : "Profesor no encontrado.";
-            JOptionPane.showMessageDialog(this, msg);
-        });
+    private void panelEliminarEstudiante() {
+        panelCentral.removeAll();
+
+        JPanel p = new JPanel(new FlowLayout());
+        JTextField c = new JTextField(8);
+        JButton b = new JButton("Eliminar");
+        JLabel res = new JLabel();
+
+        b.addActionListener(a -> res.setText(sistema.eliminarEstudiantePorCodigo(c.getText()) ? "✅ Eliminado"
+                : "❌ No encontrado"));
+
+        p.add(new JLabel("Código Est.:"));
+        p.add(c);
+        p.add(b);
+        p.add(res);
+
+        panelCentral.add(p, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
 
         panelCentral.revalidate();
         panelCentral.repaint();
+    }
+
+    private void panelEliminarProfesor() {
+        panelCentral.removeAll();
+
+        JPanel p = new JPanel(new FlowLayout());
+        JTextField c = new JTextField(8);
+        JButton b = new JButton("Eliminar");
+        JLabel res = new JLabel();
+
+        b.addActionListener(a -> res.setText(sistema.eliminarProfesorPorCodigo(c.getText()) ? "✅ Eliminado"
+                : "❌ No encontrado"));
+
+        p.add(new JLabel("Código Prof.:"));
+        p.add(c);
+        p.add(b);
+        p.add(res);
+
+        panelCentral.add(p, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
+    private void buscarUltimaTutoriaEstudiante() {
+        panelCentral.removeAll();
+
+        JPanel panel = new JPanel(new FlowLayout());
+        JTextField campo = new JTextField(10);
+        JButton buscar = new JButton("Buscar");
+        JLabel res = new JLabel();
+
+        buscar.addActionListener(e -> {
+            String cod = campo.getText();
+            Optional<Tutoria> tutoria = sistema.getUltimaTutoriaEstudiante(cod);
+            if (tutoria.isPresent()) {
+                Tutoria t = tutoria.get();
+                res.setText("Última tutoría: Estudiante " + t.getEstudiante().getNombre() + " con Profesor "
+                        + t.getProfesor().getNombre() + " en materia " + t.getEstudiante().getMateria() + " (" + t.getEstudiante().getHoras() + ")");
+            } else {
+                res.setText("❌ No se encontró historial");
+            }
+        });
+
+        panel.add(new JLabel("Código Estudiante:"));
+        panel.add(campo);
+        panel.add(buscar);
+        panel.add(res);
+
+        panelCentral.add(panel, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
+    private void buscarUltimaTutoriaProfesor() {
+        panelCentral.removeAll();
+
+        JPanel panel = new JPanel(new FlowLayout());
+        JTextField campo = new JTextField(10);
+        JButton buscar = new JButton("Buscar");
+        JLabel res = new JLabel();
+
+        buscar.addActionListener(e -> {
+            String cod = campo.getText();
+            Optional<Tutoria> tutoria = sistema.getUltimaTutoriaProfesor(cod);
+            if (tutoria.isPresent()) {
+                Tutoria t = tutoria.get();
+                res.setText("Última tutoría: Profesor " + t.getProfesor().getNombre() + " con Estudiante "
+                        + t.getEstudiante().getNombre() + " en materia " + t.getEstudiante().getMateria() + " (" + t.getEstudiante().getHoras() + ")");
+            } else {
+                res.setText("❌ No se encontró historial");
+            }
+        });
+
+        panel.add(new JLabel("Código Profesor:"));
+        panel.add(campo);
+        panel.add(buscar);
+        panel.add(res);
+
+        panelCentral.add(panel, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
+    // ==== PANEL PARA AGREGAR RECURSOS ACADÉMICOS ====
+    private void panelAgregarRecurso() {
+        panelCentral.removeAll();
+        panelCentral.setLayout(new BorderLayout());
+
+        JPanel form = new JPanel(new GridLayout(5, 2, 6, 6));
+        form.setBackground(Color.WHITE);
+        form.setBorder(BorderFactory.createTitledBorder("Agregar Recurso Académico"));
+
+        JTextField nombre = new JTextField();
+        JTextField link = new JTextField();
+        JTextField materia = new JTextField();
+        JLabel res = new JLabel();
+
+        JButton guardar = new JButton("Agregar");
+        guardar.setBackground(new Color(30, 135, 250));
+        guardar.setForeground(Color.WHITE);
+        guardar.addActionListener(a -> {
+            if (!nombre.getText().isEmpty() && !link.getText().isEmpty() && !materia.getText().isEmpty()) {
+                recursosAcademicos.add(new RecursoAcademico(nombre.getText(), link.getText(), materia.getText()));
+                res.setText("✅ Recurso agregado");
+                nombre.setText("");
+                link.setText("");
+                materia.setText("");
+            } else {
+                res.setText("❌ Llene todos los campos");
+            }
+        });
+
+        form.add(new JLabel("Nombre:"));
+        form.add(nombre);
+        form.add(new JLabel("Link:"));
+        form.add(link);
+        form.add(new JLabel("Materia:"));
+        form.add(materia);
+        form.add(guardar);
+        form.add(res);
+
+        panelCentral.add(form, BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
+    // ==== PANEL PARA VER RECURSOS ACADÉMICOS ====
+    private void panelVerRecursos() {
+        panelCentral.removeAll();
+
+        String[] columnas = { "Nombre", "Link", "Materia" };
+        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        recursosAcademicos.forEach(r -> model.addRow(new Object[] { r.getNombre(), r.getLink(), r.getMateria() }));
+
+        JTable tabla = new JTable(model);
+
+        panelCentral.add(new JScrollPane(tabla), BorderLayout.CENTER);
+        panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
+
+        panelCentral.revalidate();
+        panelCentral.repaint();
+    }
+
+    private String generarCedulaAleatoria(int digitos) {
+        Random rand = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < digitos; i++) {
+            sb.append(rand.nextInt(10));
+        }
+        return sb.toString();
     }
 
     public static void main(String[] args) {
-        GestionApoyos sistema = new GestionApoyos();
-        SwingUtilities.invokeLater(() -> new MainFrame(sistema).setVisible(true));
+        SwingUtilities.invokeLater(MainFrame::new);
     }
 }
