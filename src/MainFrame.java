@@ -80,7 +80,7 @@ public class MainFrame extends JFrame {
         botones[6].addActionListener(e -> buscarUltimaTutoriaProfesor());
         botones[7].addActionListener(e -> panelAgregarRecurso());
         botones[8].addActionListener(e -> panelVerRecursos());
-        botones[9].addActionListener(e -> panelGestionarRecursos()); // Agregado
+        botones[9].addActionListener(e -> panelGestionarRecursos());
 
         return menu;
     }
@@ -240,8 +240,12 @@ public class MainFrame extends JFrame {
             Profesor prof = (Profesor) cp.getSelectedItem();
             if (est != null && prof != null) {
                 if (est.getMateria().equalsIgnoreCase(prof.getMateria())) {
-                    sistema.asignarTutor(est, prof);
-                    res.setText("✅ Asignado " + est.getNombre() + " con " + prof.getNombre());
+                    try {
+                        sistema.asignarTutor(est, prof);
+                        res.setText("✅ Asignado " + est.getNombre() + " con " + prof.getNombre());
+                    } catch (GestionApoyos.AsignacionTutoriaException ex) {
+                        res.setText("❌ " + ex.getMessage());
+                    }
                 } else {
                     res.setText("Error: materias no coinciden");
                 }
@@ -264,7 +268,7 @@ public class MainFrame extends JFrame {
         panelCentral.repaint();
     }
 
-    // PANEL DE SOLICITUDES (mejorado: sí se muestran las solicitudes actuales)
+
     private void panelSolicitudes() {
         panelCentral.removeAll();
 
@@ -470,7 +474,7 @@ public class MainFrame extends JFrame {
                 res.setText("Última tutoría: Estudiante " + t.getEstudiante().getNombre() + " con Profesor "
                         + t.getProfesor().getNombre() + " en materia " + t.getEstudiante().getMateria() + " (" + t.getEstudiante().getHoras() + ")");
             } else {
-                res.setText("❌ No se encontró historial");
+                res.setText("❌ No se encontró tutoría para el código: " + cod);
             }
         });
 
@@ -502,7 +506,7 @@ public class MainFrame extends JFrame {
                 res.setText("Última tutoría: Profesor " + t.getProfesor().getNombre() + " con Estudiante "
                         + t.getEstudiante().getNombre() + " en materia " + t.getEstudiante().getMateria() + " (" + t.getEstudiante().getHoras() + ")");
             } else {
-                res.setText("❌ No se encontró historial");
+                res.setText("❌ No se encontró tutoría para el código: " + cod);
             }
         });
 
@@ -518,12 +522,10 @@ public class MainFrame extends JFrame {
         panelCentral.repaint();
     }
 
-    // ==== PANEL PARA AGREGAR RECURSOS ACADÉMICOS ====
     private void panelAgregarRecurso() {
         panelCentral.removeAll();
-        panelCentral.setLayout(new BorderLayout());
 
-        JPanel form = new JPanel(new GridLayout(5, 2, 6, 6));
+        JPanel form = new JPanel(new GridLayout(4, 2, 6, 6));
         form.setBackground(Color.WHITE);
         form.setBorder(BorderFactory.createTitledBorder("Agregar Recurso Académico"));
 
@@ -532,19 +534,25 @@ public class MainFrame extends JFrame {
         JTextField materia = new JTextField();
         JLabel res = new JLabel();
 
-        JButton guardar = new JButton("Agregar");
-        guardar.setBackground(new Color(30, 135, 250));
+        JButton guardar = new JButton("Guardar");
+        guardar.setBackground(new Color(0, 123, 255));
         guardar.setForeground(Color.WHITE);
-        guardar.addActionListener(a -> {
-            if (!nombre.getText().isEmpty() && !link.getText().isEmpty() && !materia.getText().isEmpty()) {
-                recursosAcademicos.add(new RecursoAcademico(nombre.getText(), link.getText(), materia.getText()));
-                res.setText("✅ Recurso agregado");
-                nombre.setText("");
-                link.setText("");
-                materia.setText("");
-            } else {
-                res.setText("❌ Llene todos los campos");
+
+        guardar.addActionListener(e -> {
+            String n = nombre.getText();
+            String l = link.getText();
+            String m = materia.getText();
+
+            if (n.isEmpty() || l.isEmpty() || m.isEmpty()) {
+                res.setText("❌ Todos los campos son obligatorios");
+                return;
             }
+
+            recursosAcademicos.add(new RecursoAcademico(n, l, m));
+            res.setText("✅ Recurso agregado");
+            nombre.setText("");
+            link.setText("");
+            materia.setText("");
         });
 
         form.add(new JLabel("Nombre:"));
@@ -563,20 +571,17 @@ public class MainFrame extends JFrame {
         panelCentral.repaint();
     }
 
-    // ==== PANEL PARA VER RECURSOS ACADÉMICOS ====
     private void panelVerRecursos() {
         panelCentral.removeAll();
 
         String[] columnas = { "Nombre", "Link", "Materia" };
-        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        recursosAcademicos.forEach(r -> model.addRow(new Object[] { r.getNombre(), r.getLink(), r.getMateria() }));
-
+        DefaultTableModel model = new DefaultTableModel(columnas, 0);
         JTable tabla = new JTable(model);
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        recursosAcademicos.forEach(r -> model.addRow(new Object[] {
+                r.getNombre(), r.getLink(), r.getMateria()
+        }));
 
         panelCentral.add(new JScrollPane(tabla), BorderLayout.CENTER);
         panelCentral.add(crearBotonVolver(), BorderLayout.SOUTH);
@@ -597,55 +602,50 @@ public class MainFrame extends JFrame {
                 r.getNombre(), r.getLink(), r.getMateria()
         }));
 
-        JButton actualizar = new JButton("Actualizar");
-        JButton eliminar = new JButton("Eliminar");
-        JLabel resultado = new JLabel();
+        JButton btnEliminar = new JButton("Eliminar");
+        JButton btnActualizar = new JButton("Actualizar");
 
-        actualizar.setBackground(new Color(0, 123, 255));
-        actualizar.setForeground(Color.WHITE);
-        eliminar.setBackground(new Color(200, 0, 0));
-        eliminar.setForeground(Color.WHITE);
+        JPanel botones = new JPanel();
+        botones.add(btnEliminar);
+        botones.add(btnActualizar);
 
-        actualizar.addActionListener(e -> {
-            int fila = tabla.getSelectedRow();
-            if (fila != -1) {
-                String nuevoNombre = JOptionPane.showInputDialog(this, "Nuevo nombre:", model.getValueAt(fila, 0));
-                String nuevoLink = JOptionPane.showInputDialog(this, "Nuevo link:", model.getValueAt(fila, 1));
-                String nuevaMateria = JOptionPane.showInputDialog(this, "Nueva materia:", model.getValueAt(fila, 2));
-
-                if (nuevoNombre != null && nuevoLink != null && nuevaMateria != null) {
-                    model.setValueAt(nuevoNombre, fila, 0);
-                    model.setValueAt(nuevoLink, fila, 1);
-                    model.setValueAt(nuevaMateria, fila, 2);
-
-                    RecursoAcademico recurso = recursosAcademicos.get(fila);
-                    recurso.setNombre(nuevoNombre);
-                    recurso.setLink(nuevoLink);
-                    recurso.setMateria(nuevaMateria);
-
-                    resultado.setText("✅ Recurso actualizado");
-                }
-            } else {
-                resultado.setText("❌ Selecciona un recurso");
-            }
-        });
-
-        eliminar.addActionListener(e -> {
+        btnEliminar.addActionListener(e -> {
             int fila = tabla.getSelectedRow();
             if (fila != -1) {
                 recursosAcademicos.remove(fila);
                 model.removeRow(fila);
-                resultado.setText("✅ Recurso eliminado");
-            } else {
-                resultado.setText("❌ Selecciona un recurso");
             }
         });
 
-        JPanel botones = new JPanel(new FlowLayout());
-        botones.add(actualizar);
-        botones.add(eliminar);
-        botones.add(resultado);
+        btnActualizar.addActionListener(e -> {
+            int fila = tabla.getSelectedRow();
+            if (fila != -1) {
+                RecursoAcademico r = recursosAcademicos.get(fila);
 
+                JTextField nombre = new JTextField(r.getNombre());
+                JTextField link = new JTextField(r.getLink());
+                JTextField materia = new JTextField(r.getMateria());
+
+                Object[] campos = {
+                        "Nombre:", nombre,
+                        "Link:", link,
+                        "Materia:", materia
+                };
+
+                int opcion = JOptionPane.showConfirmDialog(null, campos, "Actualizar Recurso", JOptionPane.OK_CANCEL_OPTION);
+                if (opcion == JOptionPane.OK_OPTION) {
+                    r.setNombre(nombre.getText());
+                    r.setLink(link.getText());
+                    r.setMateria(materia.getText());
+
+                    model.setValueAt(r.getNombre(), fila, 0);
+                    model.setValueAt(r.getLink(), fila, 1);
+                    model.setValueAt(r.getMateria(), fila, 2);
+                }
+            }
+        });
+
+        panelCentral.setLayout(new BorderLayout());
         panelCentral.add(new JScrollPane(tabla), BorderLayout.CENTER);
         panelCentral.add(botones, BorderLayout.SOUTH);
         panelCentral.add(crearBotonVolver(), BorderLayout.NORTH);
@@ -653,7 +653,6 @@ public class MainFrame extends JFrame {
         panelCentral.revalidate();
         panelCentral.repaint();
     }
-
 
     private String generarCedulaAleatoria(int digitos) {
         Random rand = new Random();

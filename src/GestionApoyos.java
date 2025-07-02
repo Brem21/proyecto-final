@@ -21,8 +21,18 @@ public class GestionApoyos {
         return profesoresDisponibles;
     }
 
-    // Ahora pasa materia al crear la tutoría
-    public void asignarTutor(Estudiante e, Profesor p) {
+    public void asignarTutor(Estudiante e, Profesor p) throws AsignacionTutoriaException {
+        if (!e.getRegion().equalsIgnoreCase(p.getRegion())) {
+            throw new AsignacionTutoriaException("El profesor no pertenece a la misma región que el estudiante.");
+        }
+
+        boolean ocupado = historialTutorias.stream()
+                .anyMatch(t -> t.getProfesor().getCodigo().equalsIgnoreCase(p.getCodigo()));
+
+        if (ocupado) {
+            throw new AsignacionTutoriaException("El profesor ya tiene una tutoría asignada.");
+        }
+
         historialTutorias.add(new Tutoria(e, p, e.getMateria()));
         colaSolicitudes.remove(e);
     }
@@ -54,4 +64,12 @@ public class GestionApoyos {
         }
         return Optional.empty();
     }
+
+    // ✅ Clase interna para lanzar excepciones de asignación
+    public static class AsignacionTutoriaException extends Exception {
+        public AsignacionTutoriaException(String mensaje) {
+            super(mensaje);
+        }
+    }
 }
+
